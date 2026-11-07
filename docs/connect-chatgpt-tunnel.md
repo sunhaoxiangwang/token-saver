@@ -1,9 +1,15 @@
 # ChatGPT Web through the Secure MCP Tunnel
 
-Status: Not executed in Milestone 0. The ChatGPT proof needs the operator's OpenAI Platform
-organization, ChatGPT workspace permission, and a runtime key, and no capture of it exists in this
-repository. Milestone 0 exposes exactly one tool, `connection_probe`; ChatGPT will list nothing
-else, and a successful probe proves reachability, not token saving.
+Status: the probe was performed on 2026-11-06 by the operator through tunnel-client 0.0.20 and is
+corroborated by two independent sources in `docs/evidence/m0/`: the relay capture
+(`chatgpt.relay.*`, complete, six records, nonce `39df3fb4db92370e`, instance `7932b647…`) and the
+result the user reported from ChatGPT (`chatgpt-reported-result.json`), which carry the same nonce
+and instance id; `chatgpt-verification.json` records the helper version and the server and relay
+hashes, which equal the approved binaries. Still missing from this capture: ChatGPT's own tool-call
+export, the helper's stderr carrying the server's `startup` line, and the Platform audit entries.
+The disable, re-enable, daemon stop and restart, child kill, and removal steps have no evidence and
+remain Not executed. Milestone 0 exposes exactly one tool, `connection_probe`; ChatGPT lists
+nothing else, and a successful probe proves reachability, not token saving.
 
 The helper is a long-lived daemon, not a one-shot launcher: every ChatGPT call to token-saver is
 long-polled from OpenAI by the helper and forwarded to the stdio child it supervises. It must stay
@@ -52,9 +58,17 @@ logs, and build artifacts stay outside the repository; the ignore rules cover `*
   lists no stdio, failure-policy, or `initialized` changes; v0.0.19 introduced stdio child restart
   after an unexpected exit, the `exit` policy, session-state reset on recovery, and the rule that
   in-flight requests fail and are not replayed.
-- Not observed: wire traffic, the protocol era ChatGPT uses, confirmation behaviour, and the helper's
-  launch quoting with this server. These come only from the operator run and are recorded with the
-  helper version that produced them.
+- Wire observation from the operator run (relay capture in `docs/evidence/m0/chatgpt.relay.*`):
+  ChatGPT used the modern era, `server/discover` with `2026-07-28` metadata, then `tools/list`, then
+  `tools/call`, each carrying `2026-07-28` metadata; no `initialize`. The helper started the child
+  at daemon start and the first request arrived about 236 s later; the probe call came 87 s after
+  `tools/list`; server round trips were 2 to 5 ms; the child ran 587 s and exited 0 on a clean EOF
+  when the daemon stopped. `tools/list` and `tools/call` carried the same request id, which the
+  server accepted because the first had retired before the second arrived: through the helper,
+  request ids repeat across requests. The helper's launch quoting worked with the relay command as
+  written in step 3.
+- Not observed: ChatGPT's confirmation behaviour (no client export), the helper's stderr, and the
+  Platform audit entries.
 
 ## Operator procedure
 

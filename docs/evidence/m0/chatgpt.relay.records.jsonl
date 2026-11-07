@@ -1,0 +1,6 @@
+{"bytes":413,"dir":"in","elapsed_ms":236119,"id_sha256":"16f9b3de81825f6e","kind":"request","meta_protocol_version":"2026-07-28","method":"server/discover","unix_ms":1794017942061}
+{"bytes":576,"dir":"out","elapsed_ms":236121,"id_sha256":"16f9b3de81825f6e","kind":"response","supported_versions":["2025-11-25","2026-07-28"],"unix_ms":1794017942063}
+{"bytes":388,"dir":"in","elapsed_ms":236310,"id_sha256":"5feceb66ffc86f38","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/list","unix_ms":1794017942252}
+{"bytes":1199,"dir":"out","elapsed_ms":236313,"id_sha256":"5feceb66ffc86f38","kind":"response","unix_ms":1794017942255}
+{"bytes":1062,"dir":"in","elapsed_ms":323348,"id_sha256":"5feceb66ffc86f38","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":true,"tool":"connection_probe","unix_ms":1794018029290}
+{"bytes":382,"dir":"out","elapsed_ms":323353,"id_sha256":"5feceb66ffc86f38","instance_id":"7932b647139a4d5fb4a6b6d99f33cdac","kind":"response","nonce_match":true,"status":"ok","unix_ms":1794018029295}

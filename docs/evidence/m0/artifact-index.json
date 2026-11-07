@@ -1,17 +1,19 @@
 {
- "generated_for": "TS-M0 implementation evidence after TS-M0-CODE-REVIEW-002 (F06) correction; runs of 2026-11-06 against the final release binary",
+ "generated_for": "TS-M0 implementation evidence after TS-M0-CODE-REVIEW-002 (F06) correction; runs of 2026-11-06 against the final release binary; ChatGPT capture of 2026-11-06 added after TS-M1-REVIEW-001 C01",
  "binary_sha256": "0dc0089695aeb99d68daaeedffbbe3312d89749b5b79d17627e69cd8bd97c647",
  "binary_bytes": 1841536,
  "relay_sha256": "70d1c65c8328eddff8ef35d8dddb673f18e400fd5ee8903e4f581f2d2fe31ad5",
  "nonces": {
   "claude_run_1": "483c5ca189ca0da0",
   "claude_run_2": "1713d14cce39e326",
-  "codex": "e8d92995c736b0d0"
+  "codex": "e8d92995c736b0d0",
+  "chatgpt": "39df3fb4db92370e"
  },
  "instance_ids": {
   "claude_run_1": "15577ec82f484a69b24c17820b3318e9",
   "claude_run_2": "3728f2d9225a43e680cf1bcd2ebbf694",
-  "codex": "b6341c4612064ab29ff6ed5fdbc4c3c8"
+  "codex": "b6341c4612064ab29ff6ed5fdbc4c3c8",
+  "chatgpt": "7932b647139a4d5fb4a6b6d99f33cdac"
  },
  "claude_run_1_era": "legacy: initialize at 2025-11-25, notifications/initialized, tools/list, tools/call",
  "claude_run_2_era": "modern: server/discover, tools/list, tools/call with 2026-07-28 metadata",
@@ -36,6 +38,10 @@
   "F06_control_version_1900_01_01": "165-byte -32022 response delivered, exit 0 after EOF"
  },
  "pack_hashes": {
+  "chatgpt-reported-result.json": "e6207d6afaa8428c06ed18cc7b134745e59f784fdaf59d847abbb17e4a9e1b0f",
+  "chatgpt-verification.json": "aece4de35acbc51f72e251e065d9e8b2f916af08718ba8e35e1000dd78c8be23",
+  "chatgpt.relay.manifest.json": "6b85a90e65648cc04f9be06a9a7869bf2aad9331dcee32457b1fa9ab7076d8eb",
+  "chatgpt.relay.records.jsonl": "6813831f0283b6880b38571b8e269c9b850a77d0f5c06bc9f256e00d14775a8b",
   "claude-auto.hook.jsonl": "c3e67ad45a467bbdb7ecb3cd3698e92f1399bf0a1ea3444426e4de15fa5db2d2",
   "claude-auto.run-1.relay.manifest.json": "fba136019c5aab7d930d4c8d8cf84ebadfeaf91bf92c4e598e45c1e035cb9900",
   "claude-auto.run-1.relay.records.jsonl": "3a4efb0a9b3caff63b324e623128ec2c0533beb98788c81d6e597138951414de",
@@ -48,5 +54,17 @@
   "codex-auto.relay.records.jsonl": "c3d334e83a6cb75a15054133bf3e41a3a9bb1798b0f51d9a2af07a1699bac101",
   "codex-auto.tool-events.json": "3694deeec8c8c85c7f19a1760d6d71a5385b3e17353ff053e4c25569aa30b64b",
   "server-baseline-2026-11-06.json": "3ca3afe5af8a76f86432550784ebbe4574ce18912f5ce0954cd803ac62a83892"
+ },
+ "chatgpt_era": "modern: server/discover, tools/list, tools/call, each with 2026-07-28 metadata, through tunnel-client 0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b",
+ "chatgpt_capture": {
+  "performed": "2026-11-06 by the operator through tunnel-client 0.0.20; relay manifest complete, 6 records, both forwarding outcomes clean_eof, child exit 0 after 587 s",
+  "corroboration": "relay tools/call record with nonce_match true and instance_id equals the result the user reported from ChatGPT (chatgpt-reported-result.json); server and relay hashes in chatgpt-verification.json equal the approved binaries",
+  "sanitized_copy_equals_operator_original": true,
+  "missing": [
+   "direct ChatGPT tool-event export",
+   "server startup stderr",
+   "Platform audit entries"
+  ],
+  "note": "the reported result is a user-pasted ChatGPT response, not a client export; the relay record is the independent server-side source"
  }
 }

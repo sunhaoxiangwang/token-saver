@@ -11,9 +11,11 @@ and baseline measurements only. It exposes only `connection_probe`.
 ## Status
 
 The local implementation was approved on 2026-11-06 (TS-M0-CODE-REVIEW-003) with automated evidence
-from Claude Code and Codex CLI in `docs/evidence/m0/`. Full milestone acceptance is pending the
-operator-controlled checks: ChatGPT account eligibility, the ChatGPT tunnel proof, and the
-interactive client procedures. For ChatGPT, the tunnel helper daemon must remain running for every
+from Claude Code and Codex CLI in `docs/evidence/m0/`. The ChatGPT probe through tunnel-client 0.0.20 was performed by the operator on 2026-11-06 and is
+corroborated by the relay capture and the user-reported result (`docs/evidence/m0/chatgpt.*`). Full
+milestone acceptance is pending the remaining checks: ChatGPT's own tool-call export, the helper's
+startup stderr, the Platform audit entries, account eligibility evidence, and the interactive
+client procedures. For ChatGPT, the tunnel helper daemon must remain running for every
 call; see `docs/connect-chatgpt-tunnel.md`.
 
 ## What it does

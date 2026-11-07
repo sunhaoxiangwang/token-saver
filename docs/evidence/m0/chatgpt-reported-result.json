@@ -1,0 +1,10 @@
+{
+  "source": "user-pasted ChatGPT response in this conversation",
+  "evidence_type": "user_reported_tool_result",
+  "result": {
+    "instance_id": "7932b647139a4d5fb4a6b6d99f33cdac",
+    "nonce": "39df3fb4db92370e",
+    "server_version": "0.1.0",
+    "status": "ok"
+  }
+}

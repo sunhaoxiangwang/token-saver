@@ -34,7 +34,7 @@ per directory enforced with an exclusive lock.
 Claude Code: the `stream-json` output of `claude -p` (tool_use and tool_result blocks) and a
 PostToolUse hook that writes `hook_event_name`, `tool_name`, a SHA-256 prefix of `tool_use_id`,
 `duration_ms`, and `nonce_match` only. Codex: the `--json` output of `codex exec` (the
-`mcp_tool_call` item). ChatGPT: the tool-call details JSON exported by the operator.
+`mcp_tool_call` item). ChatGPT: the tool-call details JSON exported by the operator; when only a user-pasted response is available it is stored as a `user_reported_tool_result` and labelled as weaker evidence than a client export.
 
 ## Retention
 
