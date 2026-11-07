@@ -1,0 +1,35 @@
+{
+ "generated_for": "TS-M0 implementation evidence after TS-M0-CODE-REVIEW-001 corrections; runs of 2026-11-06 against the final release binary",
+ "codex_stderr_raw_sha256": "c0f206ac3f43d4136cd9f5e7f7550de041f385a5c0413296d480c4f67c7c3b0b",
+ "codex_stderr_raw_lines": 118,
+ "codex_stderr_extracted": [
+  "codex log: MCP server stderr -> ts_ms=0 event=startup version=0.1.0 instance_id=12293ea051f740da9c658c5b959ba717 supported_versions=2025-11-25,2026-07-28",
+  "codex log: approval_policy=never sandbox_policy=read-only mcp_servers=token-saver, codex_apps",
+  "codex log: rmcp client initialized with token-saver, negotiated protocol_version=2025-11-25"
+ ],
+ "claude_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "claude_stderr_text": "(empty)",
+ "claude_stream_sha256": "c1f653f4370ba6d3262ca5241d8d2e3ce9f1a227cbdc843853a992946a2cc2b8",
+ "codex_exec_sha256": "fa451bb7eb1c0ff00e760d9cd05bb31e4ab7f031622cefb4c7354d80b8c287e3",
+ "nonces": {
+  "claude": "861bc80f6dd7d19d",
+  "codex": "78d6e3511aa12018"
+ },
+ "binary_sha256": "027f72a25aa1fb5aa68f73f47aa046ddf588e35b12116355d7ea8fb8569a7d79",
+ "relay_sha256": "70d1c65c8328eddff8ef35d8dddb673f18e400fd5ee8903e4f581f2d2fe31ad5",
+ "reviewer_reproductions": {
+  "F01_discover_then_eof_20_runs": "20/20 responses delivered, exit 0, shutdown in_flight=0",
+  "F04_fresh_ping_1900_01_01": "-32022 with supported list",
+  "F04_fresh_modern_ping": "-32601"
+ },
+ "pack_hashes": {
+  "claude-auto.hook.jsonl": "7daa5eead21a980330304d9bd9e7f22eaebe0562cc779549498cb3f736efc56a",
+  "claude-auto.relay.manifest.json": "e5088dd976a191cf5584b928eb1a3b84ff41e5fc51e71fcddf28d7dbe99a684c",
+  "claude-auto.relay.records.jsonl": "c87812b683f7d0cad6a266ff971fd9fa5d2d6330939db31c50ee79858ef38ccb",
+  "claude-auto.tool-events.json": "9f45404a3d1516766557aef8b745d7ace11db50861d1a94c17eeddf52e6aec5a",
+  "codex-auto.relay.manifest.json": "530b9aee8784624a2191bcad8a20d652e436f7e8ffd131cb81769711c7799c7e",
+  "codex-auto.relay.records.jsonl": "794d1c4291a1783807976c8fedff50ef9a10fc9903e997501483e72886afb018",
+  "codex-auto.tool-events.json": "2bf7d79af831fc91b04bdf7f8a04a3a17d8eb6760803a50104900fa595851404",
+  "server-baseline-2026-11-05.json": "846c6a10d5501ba7b521464c0260d2b1d2e564e9ecaea5a761786d6068c13487"
+ }
+}

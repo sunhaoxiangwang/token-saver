@@ -1,0 +1,88 @@
+# ChatGPT Web through the Secure MCP Tunnel
+
+Status: Not executed in Milestone 0. The ChatGPT proof needs the operator's OpenAI Platform
+organization, ChatGPT workspace permission, and a runtime key, and no capture of it exists in this
+repository. Milestone 0 exposes exactly one tool, `connection_probe`; ChatGPT will list nothing
+else, and a successful probe proves reachability, not token saving.
+
+The helper is a long-lived daemon, not a one-shot launcher: every ChatGPT call to token-saver is
+long-polled from OpenAI by the helper and forwarded to the stdio child it supervises. It must stay
+running, with `/readyz` returning 200, for as long as ChatGPT is expected to call the server. If it
+stops, ChatGPT calls fail until it is started again, and the restarted server has a new
+`instance_id`.
+
+Two helper versions are kept apart below. The facts were researched in the pinned source of
+tunnel-client v0.0.19 (released 2026-10-30) while planning. The host now has v0.0.20 (released
+2026-11-06; Homebrew tap `openai/tools`; git sha `c2144b09…`), installed since the 2026-11-05
+preflight that found no helper, and verified read-only on 2026-11-06 together with a profile at
+`~/.config/tunnel-client/token-saver.yaml`, which was not read. Profiles, runtime keys, raw helper
+logs, and build artifacts stay outside the repository; the ignore rules cover `*.key` and
+`tunnel-client*.yaml` as a guard.
+
+## Facts from the pinned source and documentation, v0.0.19
+
+- The helper long-polls `api.openai.com` over outbound HTTPS and forwards JSON-RPC verbatim to one
+  supervised stdio child. It splits the command string with shell-style quoting and runs it without a
+  shell; cwd and environment are inherited from the helper; the child's stderr goes to the helper's
+  stderr.
+- One request lifecycle at a time crosses the shared child, whatever the server's capacity.
+- Legacy calls before `initialize` and `notifications/initialized` are answered locally with HTTP 409
+  and JSON-RPC `-32002`. Requests carrying `_meta` protocol version pass the guard.
+- `mcp.stdio_send_initialized_notification` defaults to false. Enable it only after relay evidence
+  shows the caller omitted the notification; record the change and retest.
+- `stdio_failure_policy: restart` restarts the child after an unexpected exit with backoff from
+  100 ms to 5 s. Run only one active helper per tunnel id for stdio.
+- Hosted limits: 600 requests per minute, 10 MiB per message, 120 s deadline, 1,000 pending.
+- Health surfaces named in that research: `/health/mcp` and `/health?details=true`.
+
+## Observations with the installed helper, v0.0.20 (read-only, 2026-11-06)
+
+- `tunnel-client --version` reports `0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b`.
+- The help text confirms every command and flag the procedure uses: `init --sample
+  sample_mcp_stdio_local --profile <name> --tunnel-id <id> --mcp-command "<cmd>"` (`--sample` is
+  auto-selected as the stdio sample when `--mcp-command` is given), `--control-plane-api-key-ref`
+  taking `env:VAR` or `file:/path` (default `env:CONTROL_PLANE_API_KEY`), `doctor --explain`, `run`,
+  and a `health` command that probes `/healthz` and `/readyz` with an optional PID cross-check.
+- `run` defaults: `--mcp.max-concurrent-requests 10`, `--mcp.stdio-failure-policy restart`,
+  `--mcp.stdio-send-initialized-notification` off unless opted in. `GET /health` accepts
+  `details=true`. The daemon also serves `/ui`. `/health/mcp` does not appear in the v0.0.20 help and
+  must be confirmed on a live daemon before the evidence list relies on it.
+- v0.0.20 bundles a `cloudflared` companion and a `codex` assistant surface; neither is used here.
+- Release notes: v0.0.20 concerns OAuth forwarding across HTTPS origins and startup-probe logging and
+  lists no stdio, failure-policy, or `initialized` changes; v0.0.19 introduced stdio child restart
+  after an unexpected exit, the `exit` policy, session-state reset on recovery, and the rule that
+  in-flight requests fail and are not replayed.
+- Not observed: wire traffic, the protocol era ChatGPT uses, confirmation behaviour, and the helper's
+  launch quoting with this server. These come only from the operator run and are recorded with the
+  helper version that produced them.
+
+## Operator procedure
+
+1. Platform: create the tunnel (Tunnels Read and Manage), associate the ChatGPT workspace, create a
+   Restricted runtime key with Tunnels Read and Use. Record the audit log entry.
+2. Host: `brew tap openai/tools && brew install openai/tools/tunnel-client`. Record the version
+   (v0.0.20 is installed as of 2026-11-06).
+3. Profile: `tunnel-client init --sample sample_mcp_stdio_local --profile token-saver --tunnel-id <id> --control-plane-api-key-ref file:/abs/0600/runtime.key --mcp-command "/abs/evidence-relay --expect-nonce <N> --out /abs/evidence/chatgpt -- /abs/token-saver serve --diag info"`
+   for the evidence run, or the direct server command for installation. Set
+   `mcp.max_concurrent_requests: 8` in the profile. Keep the profile and key file outside the
+   repository.
+4. `tunnel-client doctor --profile token-saver --explain`, then `tunnel-client run --profile token-saver`
+   from a shell with a minimal environment. Confirm `/readyz` returns 200 (`tunnel-client health`)
+   and keep the daemon running for the whole session.
+5. ChatGPT Web: Plugins, add, Add custom MCP server, Connection: Tunnel, select the tunnel id,
+   Authentication: No authentication, acknowledge the risk warning, Create as a plugin, install.
+6. One conversation: `@token-saver`, ask for the probe with the fresh nonce. Record the confirmation
+   behaviour exactly as observed; expand the tool call details and save the JSON.
+7. Disable the tool on the plugin page; new conversation; record. Re-enable; new conversation; record.
+8. Stop the daemon; new conversation; record. Restart; new `instance_id`. Kill the child; observe the
+   restart policy.
+9. Removal: uninstall the plugin, delete the tunnel (Tunnels Manage), revoke the runtime key, delete
+   the profile and key file.
+
+## Evidence
+
+ChatGPT tool-call JSON, relay records with `nonce_match: true` and `instance_id`, the observed
+`initialize` version or `_meta` version, `/readyz` and `/health?details=true` output (and
+`/health/mcp` if it exists), the helper's stderr carrying the server's `startup` line, the binary
+hash, the helper version, and the platform audit log entries. Per-call denial is Unsupported if
+ChatGPT shows no confirmation for a read-only tool. Every item is labelled with the helper version.

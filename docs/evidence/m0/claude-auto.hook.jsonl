@@ -1,0 +1,2 @@
+{"unix_ms": 1794001365764, "hook_event_name": "PostToolUse", "tool_name": "mcp__token-saver__connection_probe", "tool_use_id_sha256": "4b013bf7c5a87e75", "duration_ms": 9, "nonce_match": true}
+{"unix_ms": 1794001667996, "hook_event_name": "PostToolUse", "tool_name": "mcp__token-saver__connection_probe", "tool_use_id_sha256": "e53ba4efa8611363", "duration_ms": 14, "nonce_match": true}

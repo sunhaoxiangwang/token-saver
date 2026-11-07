@@ -1,0 +1,47 @@
+[
+ {
+  "type": "item.started",
+  "server": "token-saver",
+  "tool": "connection_probe",
+  "arguments": {
+   "nonce": "e8d92995c736b0d0"
+  },
+  "status": "in_progress",
+  "result": null,
+  "error": null
+ },
+ {
+  "type": "item.completed",
+  "server": "token-saver",
+  "tool": "connection_probe",
+  "arguments": {
+   "nonce": "e8d92995c736b0d0"
+  },
+  "status": "completed",
+  "result": {
+   "content": [
+    {
+     "type": "text",
+     "text": "{\"instance_id\":\"b6341c4612064ab29ff6ed5fdbc4c3c8\",\"nonce\":\"e8d92995c736b0d0\",\"server_version\":\"0.1.0\",\"status\":\"ok\"}"
+    }
+   ],
+   "structured_content": {
+    "instance_id": "b6341c4612064ab29ff6ed5fdbc4c3c8",
+    "nonce": "e8d92995c736b0d0",
+    "server_version": "0.1.0",
+    "status": "ok"
+   }
+  },
+  "error": null
+ },
+ {
+  "type": "turn.completed",
+  "usage": {
+   "input_tokens": 29868,
+   "cached_input_tokens": 27008,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 104,
+   "reasoning_output_tokens": 0
+  }
+ }
+]

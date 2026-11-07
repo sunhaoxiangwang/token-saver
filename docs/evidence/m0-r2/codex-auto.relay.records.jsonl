@@ -1,0 +1,7 @@
+{"bytes":257,"dir":"in","elapsed_ms":16,"id_sha256":"5feceb66ffc86f38","kind":"request","method":"initialize","protocol_version":"2025-06-18","unix_ms":1793953675389}
+{"bytes":448,"dir":"out","elapsed_ms":16,"id_sha256":"5feceb66ffc86f38","kind":"response","protocol_version":"2025-11-25","unix_ms":1793953675390}
+{"bytes":54,"dir":"in","elapsed_ms":17,"kind":"notification","method":"notifications/initialized","unix_ms":1793953675391}
+{"bytes":85,"dir":"in","elapsed_ms":19,"id_sha256":"6b86b273ff34fce1","kind":"request","method":"tools/list","unix_ms":1793953675393}
+{"bytes":1142,"dir":"out","elapsed_ms":19,"id_sha256":"6b86b273ff34fce1","kind":"response","unix_ms":1793953675393}
+{"bytes":901,"dir":"in","elapsed_ms":4730,"id_sha256":"d4735e3a265e16ee","kind":"request","method":"tools/call","nonce_match":true,"tool":"connection_probe","unix_ms":1793953680103}
+{"bytes":358,"dir":"out","elapsed_ms":4730,"id_sha256":"d4735e3a265e16ee","instance_id":"12293ea051f740da9c658c5b959ba717","kind":"response","nonce_match":true,"status":"ok","unix_ms":1793953680103}

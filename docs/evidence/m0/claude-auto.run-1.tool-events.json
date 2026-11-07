@@ -1,0 +1,37 @@
+[
+ {
+  "type": "tool_use",
+  "name": "ToolSearch",
+  "input": {
+   "query": "select:mcp__token-saver__connection_probe",
+   "max_results": 1
+  }
+ },
+ {
+  "type": "tool_result",
+  "content": [
+   {
+    "type": "tool_reference",
+    "tool_name": "mcp__token-saver__connection_probe"
+   }
+  ]
+ },
+ {
+  "type": "tool_use",
+  "name": "mcp__token-saver__connection_probe",
+  "input": {
+   "nonce": "483c5ca189ca0da0"
+  }
+ },
+ {
+  "type": "tool_result",
+  "content": "{\"instance_id\":\"15577ec82f484a69b24c17820b3318e9\",\"nonce\":\"483c5ca189ca0da0\",\"server_version\":\"0.1.0\",\"status\":\"ok\"}"
+ },
+ {
+  "type": "result",
+  "duration_ms": 23854,
+  "duration_api_ms": 23757,
+  "num_turns": 3,
+  "is_error": false
+ }
+]

@@ -1,0 +1,40 @@
+[package]
+name = "token-saver"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "Apache-2.0"
+description = "Minimal MCP connectivity probe server over stdio (Milestone 0)"
+publish = false
+
+[workspace]
+members = ["tools/evidence-relay"]
+
+[lib]
+name = "token_saver"
+path = "src/lib.rs"
+
+[[bin]]
+name = "token-saver"
+path = "src/main.rs"
+
+[dependencies]
+rmcp = { version = "=3.9.0", default-features = false, features = ["server"] }
+tokio = { version = "1", default-features = false, features = ["rt", "macros", "sync", "time", "signal"] }
+tokio-util = { version = "0.7", default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = { version = "0.1", default-features = false, features = ["std"] }
+uuid = { version = "1", default-features = false, features = ["v4"] }
+
+[dev-dependencies]
+jsonschema = { version = "=0.60.2", default-features = false }
+libc = "0.2"
+
+[profile.release]
+opt-level = 2
+debug = false
+strip = true
+lto = "thin"
+codegen-units = 1
+

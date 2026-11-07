@@ -1,0 +1,52 @@
+{
+ "generated_for": "TS-M0 implementation evidence after TS-M0-CODE-REVIEW-002 (F06) correction; runs of 2026-11-06 against the final release binary",
+ "binary_sha256": "0dc0089695aeb99d68daaeedffbbe3312d89749b5b79d17627e69cd8bd97c647",
+ "binary_bytes": 1841536,
+ "relay_sha256": "70d1c65c8328eddff8ef35d8dddb673f18e400fd5ee8903e4f581f2d2fe31ad5",
+ "nonces": {
+  "claude_run_1": "483c5ca189ca0da0",
+  "claude_run_2": "1713d14cce39e326",
+  "codex": "e8d92995c736b0d0"
+ },
+ "instance_ids": {
+  "claude_run_1": "15577ec82f484a69b24c17820b3318e9",
+  "claude_run_2": "3728f2d9225a43e680cf1bcd2ebbf694",
+  "codex": "b6341c4612064ab29ff6ed5fdbc4c3c8"
+ },
+ "claude_run_1_era": "legacy: initialize at 2025-11-25, notifications/initialized, tools/list, tools/call",
+ "claude_run_2_era": "modern: server/discover, tools/list, tools/call with 2026-07-28 metadata",
+ "codex_era": "legacy: initialize at 2025-06-18 answered 2025-11-25 and accepted",
+ "raw_artifacts": {
+  "claude_run_1_stream_sha256": "f606a83c9c318bef6bf1457e427c71e689513e79178c538b143b6773bba2e109",
+  "claude_run_1_stderr": "(empty)",
+  "claude_run_2_stream_sha256": "ac4df5fe975cc1a07d52491d1028017d4f1cbc63e6c4b0e1c37edc0380c46a12",
+  "claude_run_2_stderr": "(empty)",
+  "codex_exec_sha256": "1da6b519d4e52be0a66d9a7f7364fb08ce1a9f3def53a05f4df8d9ac7ae1055a",
+  "codex_stderr_raw_sha256": "ebea90ec0fc13794cebc3c4d0f51b92faf60235818966556245671b7f5925794",
+  "codex_stderr_raw_lines": 120,
+  "codex_stderr_raw_disposition": "contains the account email; allowlisted lines extracted to codex-auto.log-extract.txt, raw deleted",
+  "codex_first_attempt": "a first Codex run against this binary (raw stderr sha256 f1397a52b895f60740fa36ba08cdce1e54c6e7d360d18ee07cabb9823509da34, 118 lines, deleted) succeeded but its log extraction was over-broad and was discarded; its relay files are archived outside the pack and not used as evidence"
+ },
+ "reviewer_reproductions": {
+  "F01_discover_then_eof_20_runs": "20/20 responses delivered, exit 0, shutdown trigger=eof in_flight=0 code=0",
+  "F04_fresh_ping_1900_01_01": "-32022 with supported list",
+  "F04_fresh_modern_ping": "-32601",
+  "F06_ping_id_71_version_X_x20000": "inbound 20,117 bytes; stdout 0 bytes; exit 3; stderr outbound.oversized bytes=20155, fatal cause=outbound_too_large code=3",
+  "F06_escaped_version_6000_chars": "inbound 18,123 bytes; stdout 0 bytes; exit 3; stderr outbound.oversized bytes=18161, fatal cause=outbound_too_large code=3",
+  "F06_control_version_1900_01_01": "165-byte -32022 response delivered, exit 0 after EOF"
+ },
+ "pack_hashes": {
+  "claude-auto.hook.jsonl": "c3e67ad45a467bbdb7ecb3cd3698e92f1399bf0a1ea3444426e4de15fa5db2d2",
+  "claude-auto.run-1.relay.manifest.json": "fba136019c5aab7d930d4c8d8cf84ebadfeaf91bf92c4e598e45c1e035cb9900",
+  "claude-auto.run-1.relay.records.jsonl": "3a4efb0a9b3caff63b324e623128ec2c0533beb98788c81d6e597138951414de",
+  "claude-auto.run-1.tool-events.json": "84e451ded2b25b6e620277de899af7cd9f26692f6b53b9dd5cc24f07c6205212",
+  "claude-auto.run-2.relay.manifest.json": "1de5f51ff1a0f5002d9541b8914320465308d0bbe01ae441a24870eea628e946",
+  "claude-auto.run-2.relay.records.jsonl": "a7371855deaa295a13c3abe3282ce86c1a9cfe05add0d63d047c8476e83ebc87",
+  "claude-auto.run-2.tool-events.json": "ba17d85ced61e4672fa8717ebc28de5b5a9309788d897e65827752efc3a27fe6",
+  "codex-auto.log-extract.txt": "5cde1d2a081c9b32b7ff6b77b4ec326ccda48af747b920eafe7cf847fdb0cdd3",
+  "codex-auto.relay.manifest.json": "31b758f5e529266470e2eb23451733503814ea03dc4b7f2216b7a19e1cf48cf7",
+  "codex-auto.relay.records.jsonl": "c3d334e83a6cb75a15054133bf3e41a3a9bb1798b0f51d9a2af07a1699bac101",
+  "codex-auto.tool-events.json": "3694deeec8c8c85c7f19a1760d6d71a5385b3e17353ff053e4c25569aa30b64b",
+  "server-baseline-2026-11-06.json": "3ca3afe5af8a76f86432550784ebbe4574ce18912f5ce0954cd803ac62a83892"
+ }
+}

@@ -1,0 +1,2 @@
+codex log, session: approval_policy=never sandbox_policy=read-only mcp_server_count=2
+codex log, MCP server stderr: ts_ms=1 event=startup version=0.1.0 instance_id=b6341c4612064ab29ff6ed5fdbc4c3c8 supported_versions=2025-11-25,2026-07-28

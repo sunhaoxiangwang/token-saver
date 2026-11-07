@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Confirms that the token-saver MCP server is reachable. Use this when asked to probe, test, or verify the token-saver connection. Pass a nonce of 1 to 64 ASCII letters or digits; the result echoes it with the server's instance_id, server_version, and status. It reads nothing and changes nothing.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "nonce": {
+        "description": "Caller-chosen token of 1 to 64 ASCII letters or digits, echoed back verbatim.",
+        "maxLength": 64,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9]+$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "nonce"
+    ],
+    "type": "object"
+  },
+  "name": "connection_probe",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "instance_id": {
+        "pattern": "^[0-9a-f]{32}$",
+        "type": "string"
+      },
+      "nonce": {
+        "maxLength": 64,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9]+$",
+        "type": "string"
+      },
+      "server_version": {
+        "maxLength": 16,
+        "type": "string"
+      },
+      "status": {
+        "const": "ok"
+      }
+    },
+    "required": [
+      "nonce",
+      "instance_id",
+      "server_version",
+      "status"
+    ],
+    "type": "object"
+  },
+  "title": "Connection probe"
+}

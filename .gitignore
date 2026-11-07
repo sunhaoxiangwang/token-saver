@@ -1,0 +1,6 @@
+/target
+**/*.rs.bk
+/evidence/
+# operator secrets and helper profiles never belong in the repository
+*.key
+tunnel-client*.yaml
