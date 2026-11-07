@@ -17,8 +17,8 @@ needs an earlier revision.
 
 | Client | Expected negotiation | Evidence status |
 |---|---|---|
-| Claude Code 2.1.318, v2 runtime | asks for `2026-07-28` on stdio | Passed, automated run 2 of 2026-11-06 against binary `0dc00896…`: `server/discover`, then `tools/list` and `tools/call`, all carrying `2026-07-28` metadata; see docs/evidence/m0 |
-| Claude Code 2.1.318, v1 runtime | `initialize` at `2025-11-25` | Passed, observed unforced in automated run 1 of 2026-11-06 with the same CLI version and configuration: `initialize` at `2025-11-25` accepted, then `notifications/initialized`, `tools/list`, `tools/call`; forcing it with `MCP_SDK_GENERATION=v1` was not executed |
+| Claude Code 2.1.319, v2 runtime | asks for `2026-07-28` on stdio | Passed, automated run 2 of 2026-11-06 against binary `0dc00896…`: `server/discover`, then `tools/list` and `tools/call`, all carrying `2026-07-28` metadata; see docs/evidence/m0 |
+| Claude Code 2.1.319, v1 runtime | `initialize` at `2025-11-25` | Passed, observed unforced in automated run 1 of 2026-11-06 with the same CLI version and configuration: `initialize` at `2025-11-25` accepted, then `notifications/initialized`, `tools/list`, `tools/call`; forcing it with `MCP_SDK_GENERATION=v1` was not executed |
 | Codex CLI 0.167.0, default `Legacy` mode | `initialize` at `2025-06-18`; pinned client accepts the `2025-11-25` answer | Passed, automated run 2026-11-06 against binary `0dc00896…`: `initialize` at `2025-06-18` answered with `2025-11-25`, accepted, `notifications/initialized`, `tools/list`, `tools/call`; see docs/evidence/m0 |
 | Codex CLI 0.167.0 with `mcp_2026_07_28` | `Auto` lifecycle, `server/discover` first | not executed; feature flag off here |
 | ChatGPT Web via tunnel-client (facts from the 0.0.19 source; 0.0.20 installed on the host 2026-11-06) | documented as `initialize` then `tools/list`; version unknown until captured | not executed; requires operator account steps; the helper must stay running for every call |

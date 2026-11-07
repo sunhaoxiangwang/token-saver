@@ -1,6 +1,6 @@
 # Claude Code
 
-Claude Code 2.1.318 on this host. No managed MCP policy files exist and the user settings contain
+Claude Code 2.1.319 on this host (the version recorded in the `init` line of every captured `stream-json` run; an earlier host description said 2.1.318). No managed MCP policy files exist and the user settings contain
 no MCP allow or deny lists (verified read-only on 2026-11-05).
 
 ## Automated verification, nothing persisted
