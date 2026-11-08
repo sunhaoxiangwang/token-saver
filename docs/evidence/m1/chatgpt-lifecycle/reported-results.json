@@ -1,0 +1,63 @@
+{
+ "source": "replies the operator copied from ChatGPT Web and pasted into the session, and the operator's own notes, quoted verbatim; user_reported_tool_result, weaker than a client export; the ChatGPT UI offered no per-call details to export",
+ "connector_page_controls_2026_11_07": [
+  "Permission: Allow low-risk",
+  "Manage app",
+  "App name",
+  "App description",
+  "Refresh tools",
+  "Delete app"
+ ],
+ "steps": {
+  "baseline_probe": {
+   "chatgpt_reply_verbatim": "```\n{\n  \"instance_id\": \"378e98214b094ba7b5f2dddfeeba89d2\",\n  \"nonce\": \"67c7fbc25a617bd5\",\n  \"server_version\": \"0.1.0\",\n  \"status\": \"ok\"\n}\n```\n\nTotal tool calls made: 1.",
+   "operator_note": "No permission request",
+   "received_utc": "2026-11-08T21:31:46.902Z"
+  },
+  "disable_control": {
+   "chatgpt_reply_verbatim": null,
+   "operator_note": "No way to disable",
+   "received_utc": "2026-11-08T21:34:21.476Z"
+  },
+  "probe_while_stopped_waiting": {
+   "chatgpt_reply_verbatim": null,
+   "operator_note": "It keeps verifying token-saver server connectivity",
+   "received_utc": "2026-11-08T21:38:59.345Z"
+  },
+  "probe_while_stopped": {
+   "chatgpt_reply_verbatim": "The `connection_probe` call failed with the following error:\n\n```\nNOT_FOUND: Error code: NOT_FOUND; Error: McpServerError: Tunnel-client did not poll after this request was enqueued. Ensure tunnel-client is running and connected, then retry.\n```\n\nNo `nonce`, `instance_id`, `server_version`, or `status` values were returned.\n\nTool calls made: 1.",
+   "operator_note": null,
+   "received_utc": "2026-11-08T21:39:41.954Z"
+  },
+  "probe_after_restart_1": {
+   "chatgpt_reply_verbatim": "The tool invocation returned no visible result text, so I cannot verify or reproduce the `instance_id`, `server_version`, or `status`.\n\nRequested nonce: `67c7fbc25a617bd5`\n\nTool calls made: 1.",
+   "operator_note": null,
+   "received_utc": "2026-11-08T21:45:28.070Z"
+  },
+  "probe_after_restart_2": {
+   "chatgpt_reply_verbatim": "The `connection_probe` call was executed with nonce `67c7fbc25a617bd5`, but the tool returned no visible result text.\n\nTherefore, I cannot verify or reproduce the `instance_id`, `server_version`, or `status`.\n\nTool calls made: 1.",
+   "operator_note": null,
+   "received_utc": "2026-11-08T21:49:08.132Z"
+  },
+  "probe_after_refresh_tools": {
+   "chatgpt_reply_verbatim": "The `connection_probe` call was executed with nonce `67c7fbc25a617bd5`, but the tool returned no visible result text.\n\nTherefore, I cannot verify or reproduce the exact `nonce`, `instance_id`, `server_version`, or `status` fields.\n\nTool calls made: 1.",
+   "operator_note": "Did,",
+   "received_utc": "2026-11-08T21:51:45.955Z"
+  },
+  "outline_after_refresh": {
+   "chatgpt_reply_verbatim": "```\nf README.md 204\nd docs\nd src\nf docs/notes.md 134\nf src/main.rs 182\n# denied_entries=0 dirs_truncated=0 dirs_unreadable=0 dirs_visited=3 entries_listed=5 excluded_dirs=0 hidden_skipped=1 other_skipped=0 stop_reason=complete symlinks=0 too_deep=0 truncated=false\n```\n\nTool calls made: 1 (one `functions.exec` invocation containing exactly one `workspace_outline` call with no arguments).",
+   "operator_note": null,
+   "received_utc": "2026-11-08T21:54:04.052Z"
+  },
+  "child_kill_command": {
+   "chatgpt_reply_verbatim": null,
+   "operator_note": "Ran",
+   "received_utc": "2026-11-08T21:55:14.555Z"
+  },
+  "search_after_automatic_restart": {
+   "chatgpt_reply_verbatim": "The `text_search` tool was invoked with:\n\n```\n{\"query\":\"needle\"}\n```\n\nThe tool call completed, but no result text was returned, so I cannot reproduce the requested final line beginning with `#`.\n\nTotal tool calls made: 1.",
+   "operator_note": null,
+   "received_utc": "2026-11-08T21:56:26.278Z"
+  }
+ }
+}

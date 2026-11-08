@@ -6,6 +6,13 @@
   "note": "M1-08 operator run through ChatGPT Web and tunnel-client against the corrected build (equal to `verification`); evidence under chatgpt/; the relay manifests' argv paths were replaced by placeholders before retention; the reported result is a user-pasted reply (weaker than a client export)",
   "relay_sha256": "836c963bc0c1a331f4b00e94364be5e68130d2e6e81483bb493b906ad19f2b1f"
  },
+ "chatgpt_lifecycle": {
+  "binary_sha256": "7c74925002e7d05ff4fa2400269bb3552792fc8043835b74352248da3e5fd229",
+  "date_local": "2026-11-08",
+  "helper_version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b (git sha: c2144b0904980bcbae2636cdca4f4167e9818e0b)",
+  "note": "ChatGPT lifecycle checks (disable and re-enable, daemon stop and restart, child kill) against the corrected build (equal to `verification`); evidence under chatgpt-lifecycle/; manifests' argv paths replaced by placeholders; replies are user-pasted (weaker than a client export)",
+  "relay_sha256": "836c963bc0c1a331f4b00e94364be5e68130d2e6e81483bb493b906ad19f2b1f"
+ },
  "clients": {
   "claude_code": "2.1.319 (from init lines)",
   "claude_model": "claude-fable-5-1 (from init lines)",
@@ -22,6 +29,19 @@
   "relay_sha256": "26c5e7e033a7ba29b49e70fafb0f9b59847e3df5e5f9f1af612036a49f016451"
  },
  "pack_hashes": {
+  "chatgpt-lifecycle/helper-stderr-extract.txt": "4c7a2f25a3915818cbed7dc59eadf2875976bce7d4a6669d3f58eb8efc47c37e",
+  "chatgpt-lifecycle/relay.run-3.manifest.json": "2be89c8b2df0de6c9ebec93f13260df2a86bcc47a18878f08408c10bec5a52d7",
+  "chatgpt-lifecycle/relay.run-4.manifest.json": "55beb8a3cbfa337b09afb5ceda67a3cb3e5a7e6e1fad7dd6ceda4d97bc235307",
+  "chatgpt-lifecycle/relay.run-4.records.jsonl": "5cf528a38b07b725635f4449217a02eb8528149281b7b2d688766e487847c58d",
+  "chatgpt-lifecycle/relay.run-5.manifest.json": "5ed0c9a4b5d3b507395888a102fed143a11b13b31b2ec0085d0f395fd1e2330f",
+  "chatgpt-lifecycle/relay.run-5.records.jsonl": "de41f7486cf6c45146b74fe76962528f8021eed4b6ad5673393602de33392389",
+  "chatgpt-lifecycle/relay.run-6.manifest.json": "7bd0ecf2c0c5d78468fd58bf6d6ae190e862f19202fba322e896101bb7fad1c1",
+  "chatgpt-lifecycle/relay.run-6.records.jsonl": "111c08242761b7a86de0c143aabed657517ce50d801ec89c7484c86431049363",
+  "chatgpt-lifecycle/relay.run-7.manifest.json": "2a3d5f2b1cebed10b21e29106496d18e85a1a296313edfc42c4e2911a1f2846b",
+  "chatgpt-lifecycle/relay.run-7.records.jsonl": "b5dc882e001fe32afe801bd0518a86847c7fe3727d52233e79e4547e8520749f",
+  "chatgpt-lifecycle/reported-results.json": "673fcff4a60b2187a73784e6ad7119e442e6ba08f9e5aecffe1d0f93a9dfd3dd",
+  "chatgpt-lifecycle/reproduction.json": "8a7f486a56d682098a1dafe2eb124f8b478fd81de538e753b4fc7ec2d0f941b2",
+  "chatgpt-lifecycle/verification.json": "c98522bd977cca035718e5f8766287935cceb71a3ffcb3a7c570e167f9c0f9f4",
   "chatgpt/chatgpt-reported-result.json": "aaeded213d1f56f81da2b71e74d9743a54b1ba7aa159cc111529b9c34a3160f1",
   "chatgpt/chatgpt-reported-result.txt": "27d204bd8bb040a85940f189c31f0fade35c9e6e5a7969fe1461876a7114d748",
   "chatgpt/chatgpt-reproduction.json": "5427888b9e1def64147b0349ae1f2f8e286095ce782d44e47eb531016810c095",

@@ -1,0 +1,55 @@
+# Reduced extract of the operator's helper log for 2026-11-08 (tee of `tunnel-client run --profile token-saver-m1`),
+# local time UTC-8. Server stderr lines and the relay's and helper's plain-text lines are verbatim; JSON lines are reduced
+# to the listed keys; tunnel, client-instance, request and application identifiers and host paths are removed.
+# The daemon started at 13:24:56 (relay run 3, zero frames) wrote through a tee without append mode, which truncated
+# the file and removed the raw 2026-11-07 helper log; its shutdown line is missing because that tee ended with Ctrl-C.
+# It held port 8080 when the 13:25:11 start below failed. Later starts used an appending tee that ignores Ctrl-C.
+{"time": "2026-11-08T13:24:57.059168-08:00", "level": "INFO", "msg": "stdio MCP command started"}
+{"time": "2026-11-08T13:24:57.061803-08:00", "level": "INFO", "msg": "tunnel-client startup summary", "config_source": "profile:token-saver-m1", "mcp_target_kind": "stdio"}
+ts_ms=1 event=startup version=0.1.0 instance_id=1a8f14677eca4206b22be23d2e7007f4 supported_versions=2025-11-25,2026-07-28
+ts_ms=2 event=workspace.root workers=4 slots=8
+{"time": "2026-11-08T13:24:58.342136-08:00", "level": "INFO", "msg": "tunnel-client started", "version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b"}
+{"time": "2026-11-08T13:25:11.389557-08:00", "level": "INFO", "msg": "stdio MCP command started"}
+{"time": "2026-11-08T13:25:11.389889-08:00", "level": "ERROR", "msg": "OnStart hook failed", "error": "listen tcp 127.0.0.1:8080: bind: address already in use"}
+{"time": "2026-11-08T13:25:11.389943-08:00", "level": "ERROR", "msg": "start failed, rolling back", "error": "listen tcp 127.0.0.1:8080: bind: address already in use"}
+{"time": "2026-11-08T13:25:11.390151-08:00", "level": "WARN", "msg": "stdio MCP command exited"}
+{"time": "2026-11-08T13:25:11.390353-08:00", "level": "ERROR", "msg": "start failed", "error": "listen tcp 127.0.0.1:8080: bind: address already in use"}
+start tunnel-client: listen tcp 127.0.0.1:8080: bind: address already in use
+{"time": "2026-11-08T13:29:06.185763-08:00", "level": "INFO", "msg": "stdio MCP command started"}
+{"time": "2026-11-08T13:29:06.188319-08:00", "level": "INFO", "msg": "tunnel-client startup summary", "config_source": "profile:token-saver-m1", "mcp_target_kind": "stdio"}
+ts_ms=0 event=startup version=0.1.0 instance_id=378e98214b094ba7b5f2dddfeeba89d2 supported_versions=2025-11-25,2026-07-28
+ts_ms=0 event=workspace.root workers=4 slots=8
+{"time": "2026-11-08T13:29:06.57081-08:00", "level": "INFO", "msg": "tunnel-client started", "version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b"}
+{"time": "2026-11-08T13:31:28.380232-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+ts_ms=399368 event=shutdown trigger=sigint in_flight=0 code=0
+{"time": "2026-11-08T13:35:45.54585-08:00", "level": "INFO", "msg": "stopping control-plane poller"}
+{"time": "2026-11-08T13:35:45.587479-08:00", "level": "INFO", "msg": "stdio MCP command exited"}
+{"time": "2026-11-08T13:42:41.823075-08:00", "level": "INFO", "msg": "stdio MCP command started"}
+{"time": "2026-11-08T13:42:41.826586-08:00", "level": "INFO", "msg": "tunnel-client startup summary", "config_source": "profile:token-saver-m1", "mcp_target_kind": "stdio"}
+ts_ms=0 event=startup version=0.1.0 instance_id=3fa5e37e119642999429ab86dc389f8c supported_versions=2025-11-25,2026-07-28
+ts_ms=0 event=workspace.root workers=4 slots=8
+{"time": "2026-11-08T13:42:42.124222-08:00", "level": "INFO", "msg": "tunnel-client started", "version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b"}
+{"time": "2026-11-08T13:45:12.660663-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+ts_ms=250589 event=shutdown trigger=sigint in_flight=0 code=0
+{"time": "2026-11-08T13:46:52.419957-08:00", "level": "INFO", "msg": "stopping control-plane poller"}
+{"time": "2026-11-08T13:46:52.459136-08:00", "level": "INFO", "msg": "stdio MCP command exited"}
+{"time": "2026-11-08T13:47:53.600734-08:00", "level": "INFO", "msg": "stdio MCP command started"}
+{"time": "2026-11-08T13:47:53.603492-08:00", "level": "INFO", "msg": "tunnel-client startup summary", "config_source": "profile:token-saver-m1", "mcp_target_kind": "stdio"}
+ts_ms=2 event=startup version=0.1.0 instance_id=3d73f1e90d1547898c4ec1c4e5d409a8 supported_versions=2025-11-25,2026-07-28
+ts_ms=2 event=workspace.root workers=4 slots=8
+{"time": "2026-11-08T13:47:54.328631-08:00", "level": "INFO", "msg": "tunnel-client started", "version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b"}
+{"time": "2026-11-08T13:48:56.570961-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+{"time": "2026-11-08T13:51:12.613799-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": "openai-mcp-discover", "channel": "main"}
+{"time": "2026-11-08T13:51:12.777188-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+{"time": "2026-11-08T13:51:35.181687-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+{"time": "2026-11-08T13:53:37.174765-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+evidence-relay: run 6 incomplete: child_exited
+{"time": "2026-11-08T13:54:56.758866-08:00", "level": "WARN", "msg": "stdio MCP command failed; restarting child", "reason": "stdio MCP command stdout closed"}
+{"time": "2026-11-08T13:54:56.758699-08:00", "level": "WARN", "msg": "stdio MCP command exited"}
+{"time": "2026-11-08T13:54:56.862493-08:00", "level": "INFO", "msg": "stdio MCP command restarted"}
+ts_ms=1 event=startup version=0.1.0 instance_id=663d224b32d246bfb5115bf23b316dfc supported_versions=2025-11-25,2026-07-28
+ts_ms=1 event=workspace.root workers=4 slots=8
+{"time": "2026-11-08T13:56:15.59124-08:00", "level": "INFO", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+ts_ms=141622 event=shutdown trigger=sigint in_flight=0 code=0
+{"time": "2026-11-08T13:57:18.497433-08:00", "level": "INFO", "msg": "stopping control-plane poller"}
+{"time": "2026-11-08T13:57:18.541192-08:00", "level": "INFO", "msg": "stdio MCP command exited"}

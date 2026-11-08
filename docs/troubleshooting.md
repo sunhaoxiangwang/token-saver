@@ -13,6 +13,10 @@
 | `notification.dropped reason=no_credit` or `outstanding` | duplicate `initialized`, or sent before the initialize response was produced | expected bounded behaviour |
 | tunnel-client returns HTTP 409 and `-32002` | ChatGPT sent a legacy call before `initialize` and `notifications/initialized` passed the helper | capture traffic; enable the helper's `initialized` shim only with evidence the caller omitted it |
 | ChatGPT lists no tools | daemon not running, wrong tunnel id, or `/readyz` not 200 | `tunnel-client doctor --explain`, `/health/mcp` |
+| ChatGPT reports `NOT_FOUND` "Tunnel-client did not poll after this request was enqueued" | the helper daemon is stopped or not connected | start `tunnel-client run`; `tunnel-client health --port 8080 --require-control-plane-poll` |
+| `tunnel-client run` fails with `bind: address already in use` on 127.0.0.1:8080 | another helper daemon is already running | `lsof -nP -iTCP:8080 -sTCP:LISTEN`; stop that daemon or keep using it |
+| `health` reports the control-plane poll as FAIL right after start | the first poll succeeds about 30 s after start | recheck after 30 s |
+| ChatGPT says the tool returned no visible result text | open compatibility issue on the ChatGPT side: the server answered (four of six calls on 2026-11-08; Refresh tools did not help) | the relay record of the call and the helper's `/metrics` `command_end_to_end_latency_milliseconds_count` with `tunnel_service_status="200"` |
 | Claude Code shows the server as failed | wrong absolute path or the binary is not executable | `claude mcp get token-saver`; run the binary by hand |
 | Codex shows no tools | `-c` override parse error, or startup exceeded 10 s | `codex mcp get token-saver`; `RUST_LOG=info` shows "MCP server stderr" lines |
 | `codex exec` never starts MCP servers from a script | stdin is an open pipe; Codex reads it as additional input | redirect `< /dev/null` |

@@ -24,6 +24,10 @@
   result before and after `initialize`. Neither depends on which requests preceded it.
 - Through tunnel-client, request lifecycles are serialized to one at a time by the helper regardless
   of the server's capacity, and the helper daemon must stay running for every ChatGPT call.
+- Open compatibility issue: on 2026-11-08 ChatGPT did not show the results of four of six tool calls
+  the server answered successfully ("no visible result text"); the cause, on the ChatGPT side, is not
+  established. See `docs/compatibility.md`.
+- The ChatGPT app page offers no control that disables the app without deleting it.
 - Raw client logs may contain account identifiers (Codex logs the account email at `info`); they are summarized and deleted under the evidence policy.
 - Verified on macOS arm64 only. Linux builds are expected to work but were not run.
 - Interactive client behaviours (permission prompts, denials, ChatGPT confirmation) and the ChatGPT

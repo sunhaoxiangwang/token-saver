@@ -29,7 +29,22 @@ needs an earlier revision.
 |---|---|---|
 | Claude Code 2.1.319 | lists and calls all three tools in both eras (both runtimes appear across sessions); with `structuredContent` present it shows the model the structured JSON and drops the text block, so results are text-only; `--max-turns 12` did not bound a 65-turn run | Passed, automated proof against binary `6c943d80…`: all three tools, two provoked tool errors, every call correlated by digest with the relay, manifest complete; see `docs/evidence/m1/proofs/claude.*` |
 | Codex CLI 0.167.0 | lists and calls all three tools through its legacy `initialize`; `exec --json` reports `mcp_tool_call` items without `isError` and without a model id; the model is pinned by `-c model` | Passed, automated proof against binary `6c943d80…`: all three tools, two provoked tool errors (`is_error` from the relay), every call correlated by digest, manifest complete; see `docs/evidence/m1/proofs/codex.*` |
-| ChatGPT Web via tunnel-client 0.0.20 | `server/discover` with `2026-07-28` metadata, then `tools/list` and four `tools/call`, each with `2026-07-28` metadata; lists and calls all three tools; the denied-path tool error reaches the user as an `INVALID_ARGUMENT` exception text quoting `denied path`; the same request id on every forwarded request | Passed, operator run 2026-11-07 against binary `7c749250…`: relay capture complete (6 frames each way, 12 records, child exit 0), every argument and result digest equal to a local reproduction with the approved binary, user-reported result identical to the server text; client export and Platform audit entries missing; token counts Unsupported, payload bytes in `docs/evidence/m1/chatgpt/`; disable, re-enable, stop, restart, kill, and removal steps Not executed |
+| ChatGPT Web via tunnel-client 0.0.20 | `server/discover` with `2026-07-28` metadata, then `tools/list` and four `tools/call`, each with `2026-07-28` metadata; lists and calls all three tools; the denied-path tool error reaches the user as an `INVALID_ARGUMENT` exception text quoting `denied path`; the same request id on every forwarded request | Passed, operator run 2026-11-07 against binary `7c749250…`: relay capture complete (6 frames each way, 12 records, child exit 0), every argument and result digest equal to a local reproduction with the approved binary, user-reported result identical to the server text; client export and Platform audit entries missing; token counts Unsupported, payload bytes in `docs/evidence/m1/chatgpt/`. Lifecycle, operator run 2026-11-08 (`docs/evidence/m1/chatgpt-lifecycle/`): disable and re-enable Unsupported (no disable control on the app page); daemon stop, restart, and child kill Passed (server side: new instance ids, the helper restarted a killed child after 104 ms); four successfully answered results not shown by ChatGPT, an open compatibility issue (below); per-call prompts Not recorded; per-call denial test Not executed; removal Not executed |
+
+## Open compatibility issues
+
+- ChatGPT result display, ChatGPT Web through tunnel-client 0.0.20, first observed 2026-11-08,
+  open. ChatGPT did not show the results of four tool calls that the server answered successfully and
+  the helper delivered upstream with HTTP 200: three `connection_probe` calls after the daemon outage
+  and one `text_search` call after the child restart. For each, ChatGPT replied that the tool
+  returned no visible result text. It showed the results of the other two calls: the probe before
+  the outage and a `workspace_outline` call after Refresh tools. Both a result with structured
+  content and a plain-text result were affected. A new conversation for every call and Refresh
+  tools, which reached the server as `server/discover` and `tools/list`, did not change the outcome.
+  The cause is not established; every affected response left the host successfully, so it lies on
+  the ChatGPT side of the tunnel.
+  Evidence: `docs/evidence/m1/chatgpt-lifecycle/` (`open_compatibility_issues` in
+  `verification.json`).
 
 ## SDK behaviours recorded during verification
 

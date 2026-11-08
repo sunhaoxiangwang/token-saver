@@ -86,7 +86,8 @@ superseded resubmissions are kept as `m0-r<n>/` with their own index so that ear
 stay reproducible. `m1/` holds the Milestone 1 proofs (`proofs/`) and the comparison (`compare/`:
 `report.json`, `report.md`, one attempt record per run) for the historical binary hash named in its
 index, the corrected build's verification proofs and checks (`verification/`), and the ChatGPT
-operator capture (`chatgpt/`), each block of the index naming the binary and relay hashes it was
+operator captures (`chatgpt/` for the functional calls, `chatgpt-lifecycle/` for the lifecycle
+checks), each block of the index naming the binary and relay hashes it was
 produced with.
 Each index records the raw-artifact hashes, their disposition, and per-file hashes.
 

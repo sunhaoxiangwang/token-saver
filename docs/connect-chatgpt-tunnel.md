@@ -7,8 +7,9 @@ result the user reported from ChatGPT (`chatgpt-reported-result.json`), which ca
 and instance id; `chatgpt-verification.json` records the helper version and the server and relay
 hashes, which equal the approved binaries. Still missing from this capture: ChatGPT's own tool-call
 export, the helper's stderr carrying the server's `startup` line, and the Platform audit entries.
-The disable, re-enable, daemon stop and restart, child kill, and removal steps have no evidence and
-remain Not executed. Milestone 0 exposes exactly one tool, `connection_probe`; ChatGPT lists
+The disable, re-enable, daemon stop and restart, child kill, and removal steps have no evidence for
+the Milestone 0 build and remain Not executed there; all but removal were run on 2026-11-08 against
+the Milestone 1 build (see the Milestone 1 section). Milestone 0 exposes exactly one tool, `connection_probe`; ChatGPT lists
 nothing else, and a successful probe proves reachability, not token saving.
 
 The helper is a long-lived daemon, not a one-shot launcher: every ChatGPT call to token-saver is
@@ -88,6 +89,7 @@ logs, and build artifacts stay outside the repository; the ignore rules cover `*
 6. One conversation: `@token-saver`, ask for the probe with the fresh nonce. Record the confirmation
    behaviour exactly as observed; expand the tool call details and save the JSON.
 7. Disable the tool on the plugin page; new conversation; record. Re-enable; new conversation; record.
+   (On 2026-11-08 the app page offered no control that disables the app without deleting it.)
 8. Stop the daemon; new conversation; record. Restart; new `instance_id`. Kill the child; observe the
    restart policy.
 9. Removal: uninstall the plugin, delete the tunnel (Tunnels Manage), revoke the runtime key, delete
@@ -146,8 +148,54 @@ come from the relay records (request frames 4,207 bytes and response frames 1,61
 calls, 1,135 bytes of result text).
 
 Still missing: ChatGPT's own tool-call export, the Platform audit entries, and the doctor and health
-outputs (pasted during the run, not retained). Not executed for Milestone 1: disable, re-enable,
-daemon stop and restart, child kill, and removal.
+outputs (pasted during the run, not retained). The lifecycle steps were run the next day (below).
+
+### Lifecycle checks, 2026-11-08
+
+Run by the operator one step at a time on the same profile, binary, relay, and demo root. Evidence
+in `docs/evidence/m1/chatgpt-lifecycle/`: sanitized relay manifests and records of runs 3 to 7, a
+reduced helper stderr extract with every server `startup`, `workspace.root` and `shutdown` line,
+the ChatGPT replies quoted verbatim, a local reproduction, and a verification report. Every tool call
+the relay recorded equals the local reproduction with the same binary and root.
+
+| Step | Status | Observation |
+|---|---|---|
+| Disable and re-enable | Unsupported | the app page offers Permission, Manage app, Refresh tools, and Delete app, and no control that turns the app off without deleting it |
+| Daemon stop | Passed | Ctrl-C ended the server orderly (shutdown line, code 0); the relay sealed its run complete |
+| Call while stopped | Passed | the call failed as the procedure expects: ChatGPT showed "verifying token-saver server connectivity", then `NOT_FOUND` "Tunnel-client did not poll after this request was enqueued"; nothing reached the host; time to failure Not recorded |
+| Daemon restart | Passed | server side: two restarts, each with a new instance id; the next call was served with a matching nonce and status ok, without a new discovery; ChatGPT did not show those results (open compatibility issue below) |
+| Child kill | Passed | SIGKILL of the server; the relay sealed its run with every record; the helper logged "stdio MCP command failed; restarting child" and restarted it 104 ms later as a new instance, which served the next call; the daemon kept running; ChatGPT did not show that result (open compatibility issue below) |
+| Removal | Not executed | |
+| Per-call prompts | Not recorded | |
+| Per-call denial test | Not executed | |
+| Token counts | Unsupported | payload bytes are in the relay records |
+
+Open compatibility issue, ChatGPT result display (first observed 2026-11-08). ChatGPT did not show
+the results of four tool calls that the server answered successfully and the helper delivered
+upstream with HTTP 200: three `connection_probe` calls after the daemon outage and one `text_search`
+call after the child restart. For each, ChatGPT replied that the tool returned no visible result
+text. It showed the results of the other two calls: the probe before the outage and a
+`workspace_outline` call after Refresh tools. Both a result with structured content and a plain-text
+result were affected. A new conversation for every call and Refresh tools, which reached the server
+as `server/discover` and `tools/list`, did not change the outcome. The cause is not established;
+every affected response left the host successfully, so it lies on the ChatGPT side of the tunnel.
+ChatGPT described the displayed outline call as a `functions.exec` invocation wrapping the tool
+call; no earlier reply named that wrapper, and whether it relates to the issue is not established.
+
+Other observations: after a restart, ChatGPT went straight to `tools/call` with the cached catalog.
+The first successful control-plane poll came 30 s after start (`tunnel-client health --port 8080
+--require-control-plane-poll`; `health` takes no `--profile`). A second `run` while one is active
+fails with `listen tcp 127.0.0.1:8080: bind: address already in use`. Log the daemon with an
+appending tee that ignores Ctrl-C, so a restart does not truncate the log and the server's shutdown
+line is kept:
+
+```sh
+tunnel-client run --profile token-saver-m1 2>&1 | ( trap '' INT; exec tee -a /abs/helper.log )
+```
+
+On 2026-11-08 a start through a tee without append mode truncated the helper log and removed the raw
+2026-11-07 log. The reduced extract in `docs/evidence/m1/chatgpt/` was made from it the day before
+and is unchanged, but it can no longer be re-derived from the raw log.
 
 To repeat it: add `--root /abs/project` to the helper's `--mcp-command` (quote the command), using
 only a directory whose content you would upload to ChatGPT, then from ChatGPT call

@@ -1,0 +1,375 @@
+{
+ "verification": "ChatGPT Web lifecycle checks through tunnel-client against the approved Milestone 1 build, operator run 2026-11-08 (UTC-8), one step at a time; every tool call recorded by the relay equals a local reproduction with the same binary and root",
+ "helper_version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b (git sha: c2144b0904980bcbae2636cdca4f4167e9818e0b)",
+ "server_binary_sha256": "7c74925002e7d05ff4fa2400269bb3552792fc8043835b74352248da3e5fd229",
+ "relay_binary_sha256": "836c963bc0c1a331f4b00e94364be5e68130d2e6e81483bb493b906ad19f2b1f",
+ "binaries_equal_index_verification_block": true,
+ "profile": "token-saver-m1 (relay in front of the server, --root on the four-file demo directory; not read here)",
+ "statuses": {
+  "disable_and_re_enable": "Unsupported: the ChatGPT app page offers Permission, Manage app, Refresh tools and Delete app, and no control that turns the app off without deleting it (operator, 2026-11-08: 'No way to disable')",
+  "daemon_stop": "Passed: Ctrl-C at 13:35:45 ended the server orderly (shutdown line, code 0) and the relay sealed run 4 complete",
+  "call_while_stopped": "Passed: with the daemon stopped the call failed as the procedure expects; ChatGPT showed 'verifying token-saver server connectivity' and then NOT_FOUND 'Tunnel-client did not poll after this request was enqueued'; nothing reached the host (no relay run, no log lines between 13:35:45 and 13:42:41); time to failure Not recorded",
+  "daemon_restart": "Passed: server side, two restarts (13:42:41, 13:47:53) each produced a new instance id, and the server answered the next ChatGPT call with a matching nonce and status ok without a new discovery; ChatGPT did not show those results (open_compatibility_issues)",
+  "child_kill": "Passed: SIGKILL of the server at 13:54:56; the relay sealed run 6 (reason child_exited, signal 9, all 10 records, no drops); the helper logged 'stdio MCP command failed; restarting child' and restarted it 104 ms later as instance 663d224b…, which served the next call; the daemon kept running; ChatGPT did not show that call's result (open_compatibility_issues)",
+  "removal": "Not executed",
+  "per_call_prompts": "Not recorded",
+  "per_call_denial_test": "Not executed",
+  "token_counts": "Unsupported"
+ },
+ "open_compatibility_issues": [
+  {
+   "title": "ChatGPT does not show some tool results that the server answered successfully",
+   "status": "open",
+   "first_observed": "2026-11-08",
+   "summary": "ChatGPT did not show the results of four tool calls that the server answered successfully and the helper delivered upstream with HTTP 200 (helper metrics, checked for runs 5 to 7): three connection_probe calls after the daemon outage and one text_search call after the child restart; for each it replied that the tool returned no visible result text. It showed the results of the other two calls: the baseline probe before the outage and a workspace_outline call after Refresh tools. Both a result with structured content (connection_probe) and a plain-text result (text_search) were affected.",
+   "affected_calls": [
+    {
+     "run": 5,
+     "at_local": "2026-11-08T13:45:12.537-08:00",
+     "tool": "connection_probe",
+     "result_sha256": "9e781ed830acc126",
+     "instance_id": "3fa5e37e119642999429ab86dc389f8c"
+    },
+    {
+     "run": 6,
+     "at_local": "2026-11-08T13:48:56.460-08:00",
+     "tool": "connection_probe",
+     "result_sha256": "e5be25223a3f5c53",
+     "instance_id": "3d73f1e90d1547898c4ec1c4e5d409a8"
+    },
+    {
+     "run": 6,
+     "at_local": "2026-11-08T13:51:35.077-08:00",
+     "tool": "connection_probe",
+     "result_sha256": "e5be25223a3f5c53",
+     "instance_id": "3d73f1e90d1547898c4ec1c4e5d409a8"
+    },
+    {
+     "run": 7,
+     "at_local": "2026-11-08T13:56:15.495-08:00",
+     "tool": "text_search",
+     "result_sha256": "94451a17b91108b6",
+     "instance_id": null
+    }
+   ],
+   "shown_calls": [
+    {
+     "run": 4,
+     "at_local": "2026-11-08T13:31:28.220-08:00",
+     "tool": "connection_probe",
+     "result_sha256": "57e0dab8999c590f",
+     "instance_id": "378e98214b094ba7b5f2dddfeeba89d2"
+    },
+    {
+     "run": 6,
+     "at_local": "2026-11-08T13:53:36.971-08:00",
+     "tool": "workspace_outline",
+     "result_sha256": "ab2c1ef61142a240",
+     "instance_id": null
+    }
+   ],
+   "tried": [
+    "a new ChatGPT conversation for every call",
+    "Refresh tools on the app page, which reached the server as server/discover and tools/list and did not change the outcome"
+   ],
+   "cause": "not established; every affected response left the host successfully, so the failure lies on the ChatGPT side of the tunnel",
+   "observation": "ChatGPT described the displayed outline call as 'one functions.exec invocation containing exactly one workspace_outline call'; no earlier reply named that wrapper; whether it relates to the issue is not established"
+  }
+ ],
+ "daemons": [
+  {
+   "start_local": "2026-11-08T13:24:56",
+   "logged": true,
+   "relay_run": 3,
+   "instance_id": "1a8f14677eca4206b22be23d2e7007f4",
+   "end_local": "2026-11-08T13:28:50.244-08:00",
+   "end": "Ctrl-C, orderly per the relay (child exit 0); shutdown line not captured",
+   "note": "started through a tee without append mode, which truncated the helper log and removed the raw 2026-11-07 log; zero frames"
+  },
+  {
+   "start_local": "2026-11-08T13:25:11",
+   "logged": true,
+   "relay_run": null,
+   "note": "failed: listen tcp 127.0.0.1:8080: bind: address already in use (the 13:24:56 daemon held the port)"
+  },
+  {
+   "start_local": "2026-11-08T13:29:06.188-08:00",
+   "logged": true,
+   "relay_run": 4,
+   "instance_id": "378e98214b094ba7b5f2dddfeeba89d2",
+   "end_local": "2026-11-08T13:35:45.578-08:00",
+   "end": "Ctrl-C, orderly"
+  },
+  {
+   "start_local": "2026-11-08T13:42:41.827-08:00",
+   "logged": true,
+   "relay_run": 5,
+   "instance_id": "3fa5e37e119642999429ab86dc389f8c",
+   "end_local": "2026-11-08T13:46:52.451-08:00",
+   "end": "Ctrl-C, orderly",
+   "first_control_plane_poll_after_s": 30
+  },
+  {
+   "start_local": "2026-11-08T13:47:53.604-08:00",
+   "logged": true,
+   "relay_run": 6,
+   "instance_id": "3d73f1e90d1547898c4ec1c4e5d409a8",
+   "end_local": "2026-11-08T13:54:56.740-08:00",
+   "end": "server killed with SIGKILL; helper restarted the child",
+   "first_control_plane_poll_after_s": 30
+  },
+  {
+   "start_local": "2026-11-08T13:54:56.865-08:00",
+   "logged": true,
+   "relay_run": 7,
+   "instance_id": "663d224b32d246bfb5115bf23b316dfc",
+   "end_local": "2026-11-08T13:57:18.531-08:00",
+   "end": "Ctrl-C, orderly",
+   "note": "child restarted by the helper's restart policy inside the daemon started at 13:47:53"
+  }
+ ],
+ "relay_runs": {
+  "3": {
+   "complete": true,
+   "reason": "orderly",
+   "frames_in": 0,
+   "frames_out": 0,
+   "records": 0,
+   "dropped": 0,
+   "late_frames": 0,
+   "in_flight_unresolved": 0,
+   "inbound_outcome": "clean_eof",
+   "outbound_outcome": "clean_eof",
+   "child_exit": {
+    "code": 0,
+    "signal": null
+   }
+  },
+  "4": {
+   "complete": true,
+   "reason": "orderly",
+   "frames_in": 1,
+   "frames_out": 1,
+   "records": 2,
+   "dropped": 0,
+   "late_frames": 0,
+   "in_flight_unresolved": 0,
+   "inbound_outcome": "clean_eof",
+   "outbound_outcome": "clean_eof",
+   "child_exit": {
+    "code": 0,
+    "signal": null
+   }
+  },
+  "5": {
+   "complete": true,
+   "reason": "orderly",
+   "frames_in": 1,
+   "frames_out": 1,
+   "records": 2,
+   "dropped": 0,
+   "late_frames": 0,
+   "in_flight_unresolved": 0,
+   "inbound_outcome": "clean_eof",
+   "outbound_outcome": "clean_eof",
+   "child_exit": {
+    "code": 0,
+    "signal": null
+   }
+  },
+  "6": {
+   "complete": false,
+   "reason": "child_exited",
+   "frames_in": 5,
+   "frames_out": 5,
+   "records": 10,
+   "dropped": 0,
+   "late_frames": 0,
+   "in_flight_unresolved": 0,
+   "inbound_outcome": "quiescent",
+   "outbound_outcome": "clean_eof",
+   "child_exit": {
+    "code": null,
+    "signal": 9
+   }
+  },
+  "7": {
+   "complete": true,
+   "reason": "orderly",
+   "frames_in": 1,
+   "frames_out": 1,
+   "records": 2,
+   "dropped": 0,
+   "late_frames": 0,
+   "in_flight_unresolved": 0,
+   "inbound_outcome": "clean_eof",
+   "outbound_outcome": "clean_eof",
+   "child_exit": {
+    "code": 0,
+    "signal": null
+   }
+  }
+ },
+ "calls": [
+  {
+   "run": 4,
+   "at_local": "2026-11-08T13:31:28.220-08:00",
+   "method": "tools/call",
+   "request_bytes": 1062,
+   "response_bytes": 382,
+   "server_ms": 3,
+   "tool": "connection_probe",
+   "args_sha256": "5b250184d0edf128",
+   "result_sha256": "57e0dab8999c590f",
+   "is_error": false,
+   "matches_reproduction": true,
+   "instance_id": "378e98214b094ba7b5f2dddfeeba89d2",
+   "nonce_match": true,
+   "status": "ok",
+   "chatgpt_showed_result": true
+  },
+  {
+   "run": 5,
+   "at_local": "2026-11-08T13:45:12.537-08:00",
+   "method": "tools/call",
+   "request_bytes": 1062,
+   "response_bytes": 382,
+   "server_ms": 4,
+   "tool": "connection_probe",
+   "args_sha256": "5b250184d0edf128",
+   "result_sha256": "9e781ed830acc126",
+   "is_error": false,
+   "matches_reproduction": true,
+   "instance_id": "3fa5e37e119642999429ab86dc389f8c",
+   "nonce_match": true,
+   "status": "ok",
+   "chatgpt_showed_result": false
+  },
+  {
+   "run": 6,
+   "at_local": "2026-11-08T13:48:56.460-08:00",
+   "method": "tools/call",
+   "request_bytes": 1062,
+   "response_bytes": 382,
+   "server_ms": 3,
+   "tool": "connection_probe",
+   "args_sha256": "5b250184d0edf128",
+   "result_sha256": "e5be25223a3f5c53",
+   "is_error": false,
+   "matches_reproduction": true,
+   "instance_id": "3d73f1e90d1547898c4ec1c4e5d409a8",
+   "nonce_match": true,
+   "status": "ok",
+   "chatgpt_showed_result": false
+  },
+  {
+   "run": 6,
+   "at_local": "2026-11-08T13:51:12.504-08:00",
+   "method": "server/discover",
+   "request_bytes": 413,
+   "response_bytes": 762,
+   "server_ms": 2
+  },
+  {
+   "run": 6,
+   "at_local": "2026-11-08T13:51:12.674-08:00",
+   "method": "tools/list",
+   "request_bytes": 388,
+   "response_bytes": 5249,
+   "server_ms": 1
+  },
+  {
+   "run": 6,
+   "at_local": "2026-11-08T13:51:35.077-08:00",
+   "method": "tools/call",
+   "request_bytes": 1062,
+   "response_bytes": 382,
+   "server_ms": 6,
+   "tool": "connection_probe",
+   "args_sha256": "5b250184d0edf128",
+   "result_sha256": "e5be25223a3f5c53",
+   "is_error": false,
+   "matches_reproduction": true,
+   "instance_id": "3d73f1e90d1547898c4ec1c4e5d409a8",
+   "nonce_match": true,
+   "status": "ok",
+   "chatgpt_showed_result": false
+  },
+  {
+   "run": 6,
+   "at_local": "2026-11-08T13:53:36.971-08:00",
+   "method": "tools/call",
+   "request_bytes": 1037,
+   "response_bytes": 378,
+   "server_ms": 2,
+   "tool": "workspace_outline",
+   "args_sha256": "44136fa355b3678a",
+   "result_sha256": "ab2c1ef61142a240",
+   "is_error": false,
+   "matches_reproduction": true,
+   "chatgpt_showed_result": true
+  },
+  {
+   "run": 7,
+   "at_local": "2026-11-08T13:56:15.495-08:00",
+   "method": "tools/call",
+   "request_bytes": 1047,
+   "response_bytes": 565,
+   "server_ms": 2,
+   "tool": "text_search",
+   "args_sha256": "22856f63675f0814",
+   "result_sha256": "94451a17b91108b6",
+   "is_error": false,
+   "matches_reproduction": true,
+   "chatgpt_showed_result": false
+  }
+ ],
+ "server_lines": [
+  "ts_ms=1 event=startup version=0.1.0 instance_id=1a8f14677eca4206b22be23d2e7007f4 supported_versions=2025-11-25,2026-07-28",
+  "ts_ms=2 event=workspace.root workers=4 slots=8",
+  "ts_ms=0 event=startup version=0.1.0 instance_id=378e98214b094ba7b5f2dddfeeba89d2 supported_versions=2025-11-25,2026-07-28",
+  "ts_ms=0 event=workspace.root workers=4 slots=8",
+  "ts_ms=399368 event=shutdown trigger=sigint in_flight=0 code=0",
+  "ts_ms=0 event=startup version=0.1.0 instance_id=3fa5e37e119642999429ab86dc389f8c supported_versions=2025-11-25,2026-07-28",
+  "ts_ms=0 event=workspace.root workers=4 slots=8",
+  "ts_ms=250589 event=shutdown trigger=sigint in_flight=0 code=0",
+  "ts_ms=2 event=startup version=0.1.0 instance_id=3d73f1e90d1547898c4ec1c4e5d409a8 supported_versions=2025-11-25,2026-07-28",
+  "ts_ms=2 event=workspace.root workers=4 slots=8",
+  "ts_ms=1 event=startup version=0.1.0 instance_id=663d224b32d246bfb5115bf23b316dfc supported_versions=2025-11-25,2026-07-28",
+  "ts_ms=1 event=workspace.root workers=4 slots=8",
+  "ts_ms=141622 event=shutdown trigger=sigint in_flight=0 code=0"
+ ],
+ "operator_original_sha256": {
+  "run-3.manifest.json": "416a42469bdcac4d20d61b6679e8d6f18ab565973d1579cf32306259e2c05180",
+  "run-3.records.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "run-4.manifest.json": "4edabd28c1bc99d1e17facbc65c29b5c58f24987730fbe53ddf5eb8f2a3ffec3",
+  "run-4.records.jsonl": "5cf528a38b07b725635f4449217a02eb8528149281b7b2d688766e487847c58d",
+  "run-5.manifest.json": "09e4630929d9df16c3599828bd6dcd9a6a48b545f789dd5c60dfbf1e0cd6abe9",
+  "run-5.records.jsonl": "de41f7486cf6c45146b74fe76962528f8021eed4b6ad5673393602de33392389",
+  "run-6.manifest.json": "2cccc0d20d8bfabb167120c881acbf6cf785b83d09f1855cd6f15a2336d89612",
+  "run-6.records.jsonl": "111c08242761b7a86de0c143aabed657517ce50d801ec89c7484c86431049363",
+  "run-7.manifest.json": "fdad6ca9390c5efea63dfb4cede0fda8bfd841b0bbded8ddfe1d66a191813c29",
+  "run-7.records.jsonl": "b5dc882e001fe32afe801bd0518a86847c7fe3727d52233e79e4547e8520749f"
+ },
+ "evidence_not_in_this_capture": [
+  "ChatGPT's own tool-call export",
+  "Platform audit entries",
+  "the shutdown line of the 13:24:56 daemon",
+  "the time ChatGPT took to fail while the daemon was stopped"
+ ],
+ "evidence_lost": "the raw 2026-11-07 helper log was overwritten at 13:24:56 on 2026-11-08 by a start command whose tee lacked append mode; the reduced extract committed in chatgpt/ was made from it on 2026-11-07 and is unchanged, but it can no longer be re-derived from the raw log",
+ "artifact_sha256": {
+  "helper-stderr-extract.txt": "4c7a2f25a3915818cbed7dc59eadf2875976bce7d4a6669d3f58eb8efc47c37e",
+  "relay.run-3.manifest.json": "2be89c8b2df0de6c9ebec93f13260df2a86bcc47a18878f08408c10bec5a52d7",
+  "relay.run-4.manifest.json": "55beb8a3cbfa337b09afb5ceda67a3cb3e5a7e6e1fad7dd6ceda4d97bc235307",
+  "relay.run-4.records.jsonl": "5cf528a38b07b725635f4449217a02eb8528149281b7b2d688766e487847c58d",
+  "relay.run-5.manifest.json": "5ed0c9a4b5d3b507395888a102fed143a11b13b31b2ec0085d0f395fd1e2330f",
+  "relay.run-5.records.jsonl": "de41f7486cf6c45146b74fe76962528f8021eed4b6ad5673393602de33392389",
+  "relay.run-6.manifest.json": "7bd0ecf2c0c5d78468fd58bf6d6ae190e862f19202fba322e896101bb7fad1c1",
+  "relay.run-6.records.jsonl": "111c08242761b7a86de0c143aabed657517ce50d801ec89c7484c86431049363",
+  "relay.run-7.manifest.json": "2a3d5f2b1cebed10b21e29106496d18e85a1a296313edfc42c4e2911a1f2846b",
+  "relay.run-7.records.jsonl": "b5dc882e001fe32afe801bd0518a86847c7fe3727d52233e79e4547e8520749f",
+  "reported-results.json": "673fcff4a60b2187a73784e6ad7119e442e6ba08f9e5aecffe1d0f93a9dfd3dd",
+  "reproduction.json": "8a7f486a56d682098a1dafe2eb124f8b478fd81de538e753b4fc7ec2d0f941b2"
+ }
+}

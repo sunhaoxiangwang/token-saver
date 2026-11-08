@@ -1,0 +1,2 @@
+{"args_bytes":18,"args_sha256":"22856f63675f0814","bytes":1047,"dir":"in","elapsed_ms":78635,"id_sha256":"5feceb66ffc86f38","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":false,"tool":"text_search","unix_ms":1794174975495}
+{"bytes":565,"dir":"out","elapsed_ms":78637,"id_sha256":"5feceb66ffc86f38","is_error":false,"kind":"response","result_bytes":450,"result_sha256":"94451a17b91108b6","unix_ms":1794174975497}

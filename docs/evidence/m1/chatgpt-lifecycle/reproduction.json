@@ -1,0 +1,26 @@
+{
+ "binary_sha256": "7c74925002e7d05ff4fa2400269bb3552792fc8043835b74352248da3e5fd229",
+ "expected": {
+  "connection_probe": {
+   "args_sha256": "5b250184d0edf128",
+   "note": "the probe text embeds the instance id, so its digest is computed per observed instance from the local text with the id substituted",
+   "result_bytes": 116,
+   "result_sha256_by_instance": {
+    "378e98214b094ba7b5f2dddfeeba89d2": "57e0dab8999c590f",
+    "3d73f1e90d1547898c4ec1c4e5d409a8": "e5be25223a3f5c53",
+    "3fa5e37e119642999429ab86dc389f8c": "9e781ed830acc126"
+   }
+  },
+  "text_search": {
+   "args_sha256": "22856f63675f0814",
+   "result_bytes": 450,
+   "result_sha256": "94451a17b91108b6"
+  },
+  "workspace_outline": {
+   "args_sha256": "44136fa355b3678a",
+   "result_bytes": 260,
+   "result_sha256": "ab2c1ef61142a240"
+  }
+ },
+ "method": "approved binary run locally (stdio, 2026-07-28) against the same demo root; digests are the first 16 hex characters of SHA-256 (arguments canonicalized as the relay does; results over the first text block)"
+}
