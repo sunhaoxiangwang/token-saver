@@ -70,7 +70,13 @@ never enter `docs/`. Retained sanitized artifacts (relay records and manifests, 
 attempt records with digests, sizes, usage, verdicts and raw hashes, summaries, indexes) must be free
 of the canaries `CANARY_DIR_7f3a` and `CANARY_CONTENT_9c1e`, the fixture's absolute path, the home
 directory, and account identifiers; the harness scans every retained file and the relay manifest's
-argv paths are replaced by placeholders before retention. A canary in a raw trace after a tool
+argv paths are replaced by placeholders before retention. Legacy exception: the six Milestone 0 relay
+manifests (`m0/chatgpt.relay.manifest.json`, `m0/claude-auto.run-1.relay.manifest.json`,
+`m0/claude-auto.run-2.relay.manifest.json`, `m0/codex-auto.relay.manifest.json`,
+`m0-r2/claude-auto.relay.manifest.json`, `m0-r2/codex-auto.relay.manifest.json`) were retained before
+this rule existed and carry the host's absolute paths in their `server` argv. They are preserved
+unchanged so that the Milestone 0 pack hashes in their indexes stay reproducible; no later pack
+repeats the exception. A canary in a raw trace after a tool
 legitimately returned it is the positive control that the extractor removes content.
 
 ## Pack directories

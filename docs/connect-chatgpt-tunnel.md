@@ -140,8 +140,8 @@ Observations: as in Milestone 0, `tools/list` and every `tools/call` carried the
 first ChatGPT request arrived 378 s after daemon start; the four calls spanned 7.3 s. The relay's
 `--expect-nonce` came from the init template; the Milestone 1 procedure calls no `connection_probe`,
 so `nonce_match` is false on every record and correlation rests on the digests. The connector page
-showed the permission setting `Allow low-risk`; whether ChatGPT prompted per call was not recorded,
-so per-call denial remains Unsupported. Token counts through ChatGPT are Unsupported; payload bytes
+showed the permission setting `Allow low-risk`. Per-call prompts: Not recorded; per-call denial
+test: Not executed. Token counts through ChatGPT are Unsupported; payload bytes
 come from the relay records (request frames 4,207 bytes and response frames 1,617 bytes over the four
 calls, 1,135 bytes of result text).
 

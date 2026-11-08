@@ -161,7 +161,8 @@
  },
  "confirmation_behaviour": {
   "connector_permission_setting": "Allow low-risk, as shown on the connector page the operator pasted (connected 2026-11-06, plugin version 1.0.0, authorization none, review status development)",
-  "per_call_prompts": "not recorded by the operator; per-call denial remains Unsupported"
+  "per_call_prompts": "Not recorded",
+  "per_call_denial_test": "Not executed"
  },
  "evidence_sources": {
   "relay_records": "read directly from the finalized local relay capture",
