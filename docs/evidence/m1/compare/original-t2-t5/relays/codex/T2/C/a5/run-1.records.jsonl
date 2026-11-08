@@ -1,0 +1,7 @@
+{"bytes":257,"dir":"in","elapsed_ms":17,"id_sha256":"5feceb66ffc86f38","kind":"request","method":"initialize","protocol_version":"2025-06-18","unix_ms":1794091821590}
+{"bytes":634,"dir":"out","elapsed_ms":17,"id_sha256":"5feceb66ffc86f38","kind":"response","protocol_version":"2025-11-25","unix_ms":1794091821590}
+{"bytes":54,"dir":"in","elapsed_ms":18,"kind":"notification","method":"notifications/initialized","unix_ms":1794091821592}
+{"bytes":85,"dir":"in","elapsed_ms":19,"id_sha256":"6b86b273ff34fce1","kind":"request","method":"tools/list","unix_ms":1794091821592}
+{"bytes":5192,"dir":"out","elapsed_ms":19,"id_sha256":"6b86b273ff34fce1","kind":"response","unix_ms":1794091821592}
+{"args_bytes":58,"args_sha256":"a91d441f7dc85268","bytes":1176,"dir":"in","elapsed_ms":5228,"id_sha256":"d4735e3a265e16ee","kind":"request","method":"tools/call","nonce_match":false,"tool":"text_search","unix_ms":1794091826802}
+{"bytes":697,"dir":"out","elapsed_ms":5231,"id_sha256":"d4735e3a265e16ee","is_error":false,"kind":"response","result_bytes":602,"result_sha256":"d619088e5df728d1","unix_ms":1794091826804}

@@ -1,0 +1,78 @@
+{
+ "answer_bytes": 635,
+ "answer_sha256": "c50ddbcebbd29d86",
+ "arm": "A",
+ "attempt": 4,
+ "attribution": "not applicable",
+ "client": "codex",
+ "client_version": null,
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "claimed": 12,
+  "expected": 12,
+  "matched": 12,
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 0,
+  "reason": "no relay capture",
+  "status": "incomplete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "gpt-6.1-sol",
+ "model_source": "pinned by -c model (Codex reports none)",
+ "native_tool_names": [
+  "command_execution"
+ ],
+ "native_tool_uses": 1,
+ "nonce_sha256": "4cb0a69a04342bc4",
+ "num_turns": 1,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 39,
+   "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+  },
+  "stream.jsonl": {
+   "bytes": 13866,
+   "sha256": "f576381df7ff8d100ca476893e765763ca00c475d3e546fc8df548531c878f89"
+  }
+ },
+ "relay": {
+  "complete": null,
+  "frames_in": null,
+  "frames_out": null,
+  "present": false,
+  "reason": null,
+  "tools_call_requests": 0
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794092323509,
+ "task": "T4",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [],
+ "total_tokens": 34738,
+ "usage": {
+  "cache_read": 27520,
+  "cache_write": 0,
+  "codex_input_total": 34559,
+  "output": 179,
+  "reasoning_output": 0,
+  "uncached_input": 7039
+ },
+ "usage_formula": "Codex sum of turn.completed.usage: input_tokens (includes cached), cached_input_tokens, cache_write_input_tokens, output_tokens (includes reasoning); total=input+output",
+ "wall_ms": 11235,
+ "warmup": false
+}

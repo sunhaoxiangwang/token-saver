@@ -1,0 +1,77 @@
+{
+ "answer_bytes": 20,
+ "answer_sha256": "c37d8e490147c908",
+ "arm": "A",
+ "attempt": 1,
+ "attribution": "not applicable",
+ "checker_version": 2,
+ "checker_version_note": "graded at run time by the T2 rule of checker version 2 (asserted value and path must be unambiguous and right); the checker_version field was added to records after this rerun started, so it was annotated afterwards on 2026-11-07; no other field was changed",
+ "client": "codex",
+ "client_version": null,
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 0,
+  "reason": "no relay capture",
+  "status": "incomplete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "gpt-6.1-sol",
+ "model_source": "pinned by -c model (Codex reports none)",
+ "native_tool_names": [
+  "command_execution"
+ ],
+ "native_tool_uses": 1,
+ "nonce_sha256": "0318ae691a35b2d0",
+ "num_turns": 1,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 39,
+   "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+  },
+  "stream.jsonl": {
+   "bytes": 1014,
+   "sha256": "7d637d074933632bc4eeb702c2b1b03985983281f9516aeb4132e236dca9d66b"
+  }
+ },
+ "relay": {
+  "complete": null,
+  "frames_in": null,
+  "frames_out": null,
+  "present": false,
+  "reason": null,
+  "tools_call_requests": 0
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794092450574,
+ "task": "T2",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [],
+ "total_tokens": 29800,
+ "usage": {
+  "cache_read": 24576,
+  "cache_write": 0,
+  "codex_input_total": 29752,
+  "output": 48,
+  "reasoning_output": 0,
+  "uncached_input": 5176
+ },
+ "usage_formula": "Codex sum of turn.completed.usage: input_tokens (includes cached), cached_input_tokens, cache_write_input_tokens, output_tokens (includes reasoning); total=input+output",
+ "wall_ms": 8302,
+ "warmup": false
+}

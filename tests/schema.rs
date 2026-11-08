@@ -134,3 +134,107 @@ fn adapter_and_handler_advertise_the_same_versions() {
         token_saver::limits::SUPPORTED_PROTOCOL_VERSIONS.to_vec()
     );
 }
+
+// ----- Workspace Reading Pack (Milestone 1) ---------------------------------------------------
+
+#[test]
+fn workspace_schemas_are_valid_json_schema_2020_12() {
+    use token_saver::workspace as ws;
+    for schema in [
+        ws::outline_input_schema(),
+        ws::outline_meta_schema(),
+        ws::slice_input_schema(),
+        ws::slice_meta_schema(),
+        ws::search_input_schema(),
+        ws::search_meta_schema(),
+    ] {
+        jsonschema::validator_for(&obj(&schema)).expect("schema valid");
+        assert_eq!(obj(&schema)["additionalProperties"], false);
+    }
+}
+
+#[test]
+fn workspace_validators_and_parser_agree_on_argument_corpus() {
+    use token_saver::workspace as ws;
+    type Corpus = Vec<(
+        &'static str,
+        std::sync::Arc<rmcp::model::JsonObject>,
+        Vec<(Value, bool)>,
+    )>;
+    let corpus: Corpus = vec![
+        (
+            ws::OUTLINE,
+            ws::outline_input_schema(),
+            vec![
+                (json!({}), true),
+                (
+                    json!({"path":"","depth":1,"max_entries":1,"include_hidden":true}),
+                    true,
+                ),
+                (json!({"path":"src","depth":3,"max_entries":200}), true),
+                (json!({"depth":0}), false),
+                (json!({"depth":4}), false),
+                (json!({"max_entries":201}), false),
+                (json!({"path":"x".repeat(1_025)}), false),
+                (json!({"path":7}), false),
+                (json!({"include_hidden":"no"}), false),
+                (json!({"extra":true}), false),
+            ],
+        ),
+        (
+            ws::SLICE,
+            ws::slice_input_schema(),
+            vec![
+                (json!({"path":"a"}), true),
+                (
+                    json!({"path":"a/b.rs","start_line":10000000,"max_lines":400,"max_bytes":12288}),
+                    true,
+                ),
+                (json!({"path":"a","max_bytes":256}), true),
+                (json!({}), false),
+                (json!({"path":""}), false),
+                (json!({"path":"a","max_bytes":255}), false),
+                (json!({"path":"a","max_bytes":12289}), false),
+                (json!({"path":"a","start_line":0}), false),
+                (json!({"path":"a","start_line":10000001}), false),
+                (json!({"path":"a","max_lines":401}), false),
+                (json!({"path":"a","start_line":1.5}), false),
+                (json!({"path":"a","other":1}), false),
+            ],
+        ),
+        (
+            ws::SEARCH,
+            ws::search_input_schema(),
+            vec![
+                (json!({"query":"x"}), true),
+                (
+                    json!({"query":"x".repeat(128),"path":"","case_sensitive":true,"max_matches":100,"context_lines":2,"include_hidden":false}),
+                    true,
+                ),
+                (json!({}), false),
+                (json!({"query":""}), false),
+                (json!({"query":"x".repeat(129)}), false),
+                (json!({"query":"x","max_matches":0}), false),
+                (json!({"query":"x","max_matches":101}), false),
+                (json!({"query":"x","context_lines":3}), false),
+                (json!({"query":"x","path":5}), false),
+                (json!({"query":"x","zzz":1}), false),
+            ],
+        ),
+    ];
+    for (tool, schema, cases) in corpus {
+        let validator = jsonschema::validator_for(&obj(&schema)).unwrap();
+        for (args, valid) in cases {
+            let schema_says = validator.is_valid(&args);
+            let parser_says = ws::parse_args(tool, args.as_object()).is_ok();
+            assert_eq!(schema_says, valid, "schema for {tool} on {args}");
+            assert_eq!(parser_says, valid, "parser for {tool} on {args}");
+        }
+    }
+    // Lexical path rules go beyond the schema: the parser rejects, the schema cannot express them.
+    for bad in ["../x", "/abs", "a//b", "./a"] {
+        assert!(ws::parse_args(ws::SLICE, json!({"path": bad}).as_object()).is_err());
+    }
+    // Control characters in a query are rejected by the parser; the schema has no pattern for them.
+    assert!(ws::parse_args(ws::SEARCH, json!({"query":"a\u{1}b"}).as_object()).is_err());
+}

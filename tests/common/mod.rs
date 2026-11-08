@@ -5,6 +5,7 @@
 #![allow(dead_code)]
 
 pub mod fixture;
+pub mod ws;
 
 use std::io::{BufRead, BufReader, Read, Write};
 use std::process::{Child, ChildStdin, Command, ExitStatus, Stdio};

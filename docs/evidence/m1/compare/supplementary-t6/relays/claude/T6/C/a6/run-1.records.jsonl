@@ -1,0 +1,4 @@
+{"bytes":508,"dir":"in","elapsed_ms":17,"id_sha256":"b10046fa8da535bb","kind":"request","meta_protocol_version":"2026-07-28","method":"server/discover","unix_ms":1794114875884}
+{"bytes":766,"dir":"out","elapsed_ms":17,"id_sha256":"b10046fa8da535bb","kind":"response","supported_versions":["2025-11-25","2026-07-28"],"unix_ms":1794114875884}
+{"bytes":479,"dir":"in","elapsed_ms":19,"id_sha256":"5feceb66ffc86f38","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/list","unix_ms":1794114875887}
+{"bytes":5249,"dir":"out","elapsed_ms":20,"id_sha256":"5feceb66ffc86f38","kind":"response","unix_ms":1794114875887}

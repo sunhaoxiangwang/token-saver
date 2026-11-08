@@ -100,3 +100,13 @@ ChatGPT tool-call JSON, relay records with `nonce_match: true` and `instance_id`
 `/health/mcp` if it exists), the helper's stderr carrying the server's `startup` line, the binary
 hash, the helper version, and the platform audit log entries. Per-call denial is Unsupported if
 ChatGPT shows no confirmation for a read-only tool. Every item is labelled with the helper version.
+
+## Workspace Reading Pack (Milestone 1), operator procedure
+
+Not executed in Milestone 1. To run it: add `--root /abs/project` to the helper's `--mcp-command`
+(quote the command), using only a directory whose content you would upload to ChatGPT, then from
+ChatGPT call `workspace_outline`, `text_search`, and `file_slice` once each and one erroneous call,
+with the relay in the command so the capture records `args_sha256` and `result_sha256` per call.
+Evidence: the relay manifest (`complete: true`) and records, your tool-call export, and the server's
+startup line from the helper's stderr. Token counts through ChatGPT are Unsupported; payload bytes
+come from the relay records.

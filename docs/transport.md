@@ -14,6 +14,7 @@ transport adapter owns bytes, framing, classification, admission, delivery, and 
 | writer | writes and flushes one frame at a time, then retires its record | stdout only |
 | supervisor | evaluates deadlines from atomics every 100 ms; forces exit | nothing |
 | diagnostics | writes allowlisted events to stderr | stderr only |
+| workers (4, `--root` only) | run workspace jobs step by step over the root descriptor | one system call at a time, each a supervised step |
 
 ## Request lifecycle
 
@@ -70,7 +71,7 @@ its handler-task bookkeeping. These are measured (see benchmark methodology), no
 | unresolved admission, 10 s | `admit_at`, kept through delivery | supervisor, exit 4 |
 | acceptance to admission, 10 s | `accepted_at` | supervisor, exit 4 |
 | registry transaction, 1 s | before `lock()` | supervisor, exit 4 |
-| startup, 3 s | process start | supervisor, exit 4 |
+| startup, 3 s | process start; covers the reader, writer, runtime start and, with `--root`, the root directory open | supervisor, exit 4 |
 | shutdown, 3 s | first trigger | supervisor, exit 1 or the latched fatal code |
 
 The acceptance budget equals the unresolved-admission budget, so a queued request is admitted no
@@ -112,3 +113,50 @@ stdout pipe.
 the handler's response and the adapter suppresses it, proving handler completion.
 `notifications/initialized` is forwarded only while a credit exists and none is outstanding. Every
 other notification and every client response is dropped with a counted diagnostic.
+
+## Workspace workers (`--root`)
+
+The Workspace Reading Pack runs blocking filesystem work on four owned threads, never on Tokio's
+blocking pool (whose tasks cannot be aborted and delay runtime shutdown).
+
+- Job slots. A handler acquires one of eight slots within 2 s or answers the tool error `busy`.
+  The permit moves into the job and is released only when the job has finished and dropped every
+  descriptor and buffer, never when the handler returns. Slots equal admitted requests, so a
+  handler waits only when earlier jobs have outlived their handlers.
+- Steps. Every blocking system call (`fstatat`, `openat`, `fstat`, `fcntl`, one `read` of at most
+  64 KiB, one directory batch of at most 256 entries) is a step. Before every step the worker checks
+  the fatal latch, the job's cancellation flag, and the deadline; a latched cause ends the job, a
+  cancellation ends it silently, the deadline stops it with `stop_reason: time_budget`.
+- Orphans. When a handler gives up (processing deadline `-32603`, or a client cancellation), it sets
+  the job's cancellation flag; the job becomes orphaned, stops at its next step boundary, releases
+  its resources and permit, and its reply is dropped. `jobs_orphaned` counts them; they hold slots
+  until they end.
+- Markers. Each worker owns two supervisor markers. The step marker is armed with `now + 2 s`
+  immediately before every step and cleared immediately after it returns, so a step's deadline is
+  measured from the step's start, never from admission. The job marker is armed at job start with
+  `deadline + 2.5 s` (the handler's processing deadline plus the grace), stays armed across every
+  checkpoint between steps, and is cleared only when the job releases its permit. Either marker
+  exceeded latches `worker_stall`, exit 4.
+
+Detection versus termination (TS-M1-REVIEW-004 clarifications):
+
+- Detection: the supervisor polls every 100 ms and latches the cause on the first poll at or after
+  a marker's deadline, so detection falls in (deadline, deadline + 0.1 s]. The latch emits
+  `event=fatal cause=worker_stall code=4`, starts the 3 s shutdown clock if none is running, and
+  cancels the runtime.
+- Admission, not revocation: the fatal-latch check admits a step; it cannot revoke a kernel call in
+  progress. A step admitted before the latch may start or finish afterwards; once a worker observes
+  the latch it admits no further step. Resources stay accounted until the job completes or the
+  process exits.
+- Termination: the cancellation ends the serve loop and `main`'s retirement loop exits with the
+  cause's code; this normally follows detection within a fraction of a second. The forced-exit
+  backstop is the shutdown clock's start plus 3 s, followed by detection on the supervisor's next
+  poll. Neither is a hard real-time guarantee under arbitrary OS scheduling.
+- Shutdown: `close` waits until deliveries are acknowledged and `jobs_queued + jobs_running` is
+  zero, or a fatal cause, or the shutdown budget, where the supervisor forces exit 1. Exit 0
+  requires zero requests, zero deliveries, and zero jobs. Workers are never joined; `main` ends with
+  `std::process::exit`.
+
+Tests: `tests/workspace_supervision.rs` (S1 to S8) in the gated fixture environment with production
+constants; `tests/wire_root.rs` against the release binary for what real filesystem objects can
+produce.

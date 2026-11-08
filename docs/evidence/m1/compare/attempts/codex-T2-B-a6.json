@@ -1,0 +1,91 @@
+{
+ "answer_bytes": 20,
+ "answer_sha256": "c37d8e490147c908",
+ "arm": "B",
+ "attempt": 6,
+ "attribution": "verified",
+ "checker_version": 2,
+ "checker_version_note": "graded at run time by the T2 rule of checker version 2 (asserted value and path must be unambiguous and right); the checker_version field was added to records after this rerun started, so it was annotated afterwards on 2026-11-07; no other field was changed",
+ "client": "codex",
+ "client_version": null,
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 1,
+  "note": null,
+  "reason": null,
+  "repeated_calls": 0,
+  "status": "complete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "gpt-6.1-sol",
+ "model_source": "pinned by -c model (Codex reports none)",
+ "native_tool_names": [],
+ "native_tool_uses": 0,
+ "nonce_sha256": "e97a3669b99d9a58",
+ "num_turns": 1,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 158,
+   "sha256": "84eaec069b79bc9ce0ff1a7f998eb78b39d79ae36d84091231ea814370576033"
+  },
+  "stream.jsonl": {
+   "bytes": 1880,
+   "sha256": "9669ac1be64012d29e0acd997cafd9ccdf8b6219a1899ece30ffccad5e5f29a0"
+  }
+ },
+ "relay": {
+  "complete": true,
+  "frames_in": 4,
+  "frames_out": 3,
+  "present": true,
+  "reason": "orderly",
+  "tools_call_requests": 1
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794092372342,
+ "task": "T2",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [
+  {
+   "args_bytes": 54,
+   "args_sha256": "894edb59094ccb9b",
+   "client_recorded_result_bytes": 980,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_is_error": false,
+   "relay_response_frame_bytes": 1082,
+   "relay_result_text_bytes": 980,
+   "result_sha256": "b926fd1e3abdf54c",
+   "server": "token-saver",
+   "tool": "text_search"
+  }
+ ],
+ "total_tokens": 47645,
+ "usage": {
+  "cache_read": 43264,
+  "cache_write": 0,
+  "codex_input_total": 47568,
+  "output": 77,
+  "reasoning_output": 0,
+  "uncached_input": 4304
+ },
+ "usage_formula": "Codex sum of turn.completed.usage: input_tokens (includes cached), cached_input_tokens, cache_write_input_tokens, output_tokens (includes reasoning); total=input+output",
+ "wall_ms": 13895,
+ "warmup": false
+}

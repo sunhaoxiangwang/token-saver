@@ -121,6 +121,24 @@ impl NotificationDrop {
     }
 }
 
+/// Workspace job kinds, for diagnostics only.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum JobKind {
+    Outline,
+    Slice,
+    Search,
+}
+
+impl JobKind {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            JobKind::Outline => "outline",
+            JobKind::Slice => "slice",
+            JobKind::Search => "search",
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Trigger {
     None,
@@ -211,6 +229,31 @@ pub enum Event {
     DiagDropped {
         count: u64,
     },
+    /// A workspace root was opened at startup. Carries counts only, never the path.
+    WorkspaceRoot {
+        workers: usize,
+        slots: usize,
+    },
+    /// `--root` could not be opened as a directory (missing, a symlink, a file, unreadable).
+    RootRefused,
+    JobStarted {
+        kind: JobKind,
+    },
+    JobFinished {
+        kind: JobKind,
+        stop_reason: &'static str,
+        steps: u64,
+        ms: u64,
+    },
+    JobOrphaned {
+        kind: JobKind,
+    },
+    JobOrphanEnded {
+        kind: JobKind,
+    },
+    JobBusy {
+        kind: JobKind,
+    },
 }
 
 impl Event {
@@ -218,10 +261,15 @@ impl Event {
         match self {
             Event::Startup { .. } => Level::Off,
             Event::Fatal { .. }
+            | Event::RootRefused
             | Event::FrameOversized { .. }
             | Event::ResultOversized { .. }
             | Event::OutboundOversized { .. } => Level::Error,
             Event::Shutdown { .. }
+            | Event::WorkspaceRoot { .. }
+            | Event::JobOrphaned { .. }
+            | Event::JobOrphanEnded { .. }
+            | Event::JobBusy { .. }
             | Event::FrameRejected { .. }
             | Event::CancelAccepted { .. }
             | Event::CancelLate { .. }
@@ -233,6 +281,8 @@ impl Event {
             Event::RequestAccepted { .. }
             | Event::RequestAdmitted { .. }
             | Event::ResponseSent { .. }
+            | Event::JobStarted { .. }
+            | Event::JobFinished { .. }
             | Event::WriteBegan { .. } => Level::Debug,
         }
     }
@@ -332,6 +382,28 @@ impl Event {
                 )
             }
             Event::DiagDropped { count } => write!(out, "event=diag.dropped count={count}"),
+            Event::WorkspaceRoot { workers, slots } => {
+                write!(out, "event=workspace.root workers={workers} slots={slots}")
+            }
+            Event::RootRefused => write!(out, "event=root.refused"),
+            Event::JobStarted { kind } => write!(out, "event=job.started kind={}", kind.as_str()),
+            Event::JobFinished {
+                kind,
+                stop_reason,
+                steps,
+                ms,
+            } => write!(
+                out,
+                "event=job.finished kind={} stop_reason={stop_reason} steps={steps} ms={ms}",
+                kind.as_str()
+            ),
+            Event::JobOrphaned { kind } => {
+                write!(out, "event=job.orphaned kind={}", kind.as_str())
+            }
+            Event::JobOrphanEnded { kind } => {
+                write!(out, "event=job.orphan_ended kind={}", kind.as_str())
+            }
+            Event::JobBusy { kind } => write!(out, "event=job.busy kind={}", kind.as_str()),
         }?;
         out.write_all(b"\n")
     }

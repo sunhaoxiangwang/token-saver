@@ -1,0 +1,140 @@
+[
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Lists the directory tree below the project root (or a subdirectory) as compact lines: `d path` for a directory, `f path bytes` for a file, `l path` for a symlink (never followed), `o path` for a special file. The last line, starting with `#`, is metadata (entries_listed, stop_reason, counters). Use it first to learn the layout before reading files. depth 1 to 3 (default 2), max_entries 1 to 200 (default 100). Hidden entries are skipped unless include_hidden is true. The directories .git, target, node_modules, .venv, and __pycache__ are listed but not entered. Read-only.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "depth": {
+          "default": 2,
+          "description": "How many directory levels to list.",
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "include_hidden": {
+          "default": false,
+          "description": "List entries whose name starts with `.`.",
+          "type": "boolean"
+        },
+        "max_entries": {
+          "default": 100,
+          "description": "Maximum entries listed.",
+          "maximum": 200,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "description": "Root-relative directory path with `/` separators; empty or omitted means the root. No leading `/`, no `.` or `..` components.",
+          "maxLength": 1024,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "name": "workspace_outline",
+    "title": "Workspace outline"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Returns lines of one text file below the project root as `<line>\\t<text>`, starting at start_line (default 1), at most max_lines lines (1 to 400, default 120) and max_bytes bytes of text (256 to 12288, default 8192). Lines over 400 characters are cut with a ` [+N chars]` suffix. A binary file returns a one-line marker. The last line, starting with `#`, is metadata (returned_lines, end_line, at_eof, total_lines, stop_reason). Use it instead of printing whole files; call again with a later start_line for more. Read-only.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "max_bytes": {
+          "default": 8192,
+          "description": "Maximum bytes of returned line text.",
+          "maximum": 12288,
+          "minimum": 256,
+          "type": "integer"
+        },
+        "max_lines": {
+          "default": 120,
+          "maximum": 400,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "description": "Root-relative file path with `/` separators. No leading `/`, no `.` or `..` components.",
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "start_line": {
+          "default": 1,
+          "description": "First line to return, 1-based.",
+          "maximum": 10000000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "name": "file_slice",
+    "title": "File slice"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Searches text files below the project root (or a subdirectory or one file) for a literal string, 1 to 128 characters, not a regular expression. Output is grep-style: a `== path` header per file, `<line>:<text>` for matches, `<line>-<text>` for context lines (context_lines 0 to 2), `--` between separated groups, and a final `#` metadata line (matches, files_scanned, stop_reason). Case-insensitive by default (ASCII folding). Skips hidden entries unless include_hidden, binary files, files over 1 MiB, symlinks, and the directories .git, target, node_modules, .venv, __pycache__. Returns at most max_matches matches (1 to 100, default 40). Read-only.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "case_sensitive": {
+          "default": false,
+          "type": "boolean"
+        },
+        "context_lines": {
+          "default": 0,
+          "maximum": 2,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "include_hidden": {
+          "default": false,
+          "type": "boolean"
+        },
+        "max_matches": {
+          "default": 40,
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "description": "Root-relative directory or file path; empty or omitted means the root.",
+          "maxLength": 1024,
+          "type": "string"
+        },
+        "query": {
+          "description": "Literal text to find; not a regular expression; no control characters.",
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "name": "text_search",
+    "title": "Text search"
+  }
+]

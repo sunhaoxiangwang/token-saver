@@ -1,0 +1,5 @@
+{"bytes":257,"dir":"in","elapsed_ms":17,"id_sha256":"5feceb66ffc86f38","kind":"request","method":"initialize","protocol_version":"2025-06-18","unix_ms":1794091829552}
+{"bytes":634,"dir":"out","elapsed_ms":17,"id_sha256":"5feceb66ffc86f38","kind":"response","protocol_version":"2025-11-25","unix_ms":1794091829552}
+{"bytes":54,"dir":"in","elapsed_ms":17,"kind":"notification","method":"notifications/initialized","unix_ms":1794091829552}
+{"bytes":85,"dir":"in","elapsed_ms":17,"id_sha256":"6b86b273ff34fce1","kind":"request","method":"tools/list","unix_ms":1794091829552}
+{"bytes":5192,"dir":"out","elapsed_ms":17,"id_sha256":"6b86b273ff34fce1","kind":"response","unix_ms":1794091829552}

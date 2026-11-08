@@ -5,7 +5,8 @@ token-saver is licensed under Apache-2.0 (see LICENSE). This file records the re
 each package declares in its Cargo metadata, and the upstream notices that must be preserved.
 
 Coverage: generated from `cargo tree -p token-saver -e normal --locked` and `cargo metadata --locked`
-on 2026-11-05. Declared licenses are taken from package metadata; the full license texts live in each
+on 2026-11-05 and extended on 2026-11-07 for Milestone 1 (`rustix` and its `bitflags` dependency;
+`linux-raw-sys` is resolved in the lockfile for Linux targets only and is not compiled on macOS). Declared licenses are taken from package metadata; the full license texts live in each
 crate's source as published on crates.io. Development-only dependencies (test harness, `jsonschema`,
 `libc` for tests) and the `tools/evidence-relay` development binary are excluded from the binary and
 from this list.
@@ -28,6 +29,7 @@ purposes and preserves both the Apache-2.0 text (LICENSE) and the MIT permission
 
 | Package | Version | Declared license | Repository |
 |---|---|---|---|
+| bitflags | 2.13.2 | MIT OR Apache-2.0 | https://github.com/bitflags/bitflags |
 | block-buffer | 0.12.1 | MIT OR Apache-2.0 | https://github.com/RustCrypto/utils |
 | bytes | 1.12.1 | MIT | https://github.com/tokio-rs/bytes |
 | cfg-if | 1.0.5 | MIT OR Apache-2.0 | https://github.com/rust-lang/cfg-if |
@@ -54,6 +56,7 @@ purposes and preserves both the Apache-2.0 text (LICENSE) and the MIT permission
 | indexmap | 2.14.2 | Apache-2.0 OR MIT | https://github.com/indexmap-rs/indexmap |
 | itoa | 1.0.18 | MIT OR Apache-2.0 | https://github.com/dtolnay/itoa |
 | libc | 0.2.191 | MIT OR Apache-2.0 | https://github.com/rust-lang/libc |
+| linux-raw-sys | 0.12.1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | https://github.com/sunfishcode/linux-raw-sys |
 | memchr | 2.8.3 | Unlicense OR MIT | https://github.com/BurntSushi/memchr |
 | mio | 1.2.4 | MIT | https://github.com/tokio-rs/mio |
 | num-traits | 0.2.19 | MIT OR Apache-2.0 | https://github.com/rust-num/num-traits |
@@ -65,6 +68,7 @@ purposes and preserves both the Apache-2.0 text (LICENSE) and the MIT permission
 | ref-cast | 1.0.27 | MIT OR Apache-2.0 | https://github.com/dtolnay/ref-cast |
 | ref-cast-impl | 1.0.27 | MIT OR Apache-2.0 | https://github.com/dtolnay/ref-cast |
 | rmcp | 3.9.0 | Apache-2.0 | https://github.com/modelcontextprotocol/rust-sdk/ |
+| rustix | 1.1.6 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | https://github.com/bytecodealliance/rustix |
 | schemars | 1.2.3 | MIT | https://github.com/GREsau/schemars |
 | schemars_derive | 1.2.3 | MIT | https://github.com/GREsau/schemars |
 | serde | 1.0.229 | MIT OR Apache-2.0 | https://github.com/serde-rs/serde |
@@ -102,3 +106,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ## Unicode-3.0 (unicode-ident)
 
 The `unicode-ident` crate is additionally licensed under the Unicode License v3; its text is distributed with that crate.
+
+## Apache-2.0 WITH LLVM-exception (rustix, linux-raw-sys)
+
+`rustix` and `linux-raw-sys` are offered under `Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT`.
+This project uses them under the plain Apache-2.0 alternative (see LICENSE), so no LLVM-exception
+text is required; the MIT permission notice above also applies to them as an alternative.

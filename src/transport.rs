@@ -13,7 +13,8 @@
 
 use std::collections::{BTreeMap, HashMap};
 use std::io::{BufRead, BufReader, Read, Write};
-use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Instant;
 
 use rmcp::model::{
@@ -152,6 +153,8 @@ pub struct Counts {
     pub initialized_outstanding: u64,
     pub available_permits: usize,
     pub available_error_budget: usize,
+    /// Workspace jobs queued or running (zero without `--root`).
+    pub jobs: usize,
 }
 
 pub struct Registry {
@@ -160,6 +163,9 @@ pub struct Registry {
     admission: Arc<Semaphore>,
     error_budget: Arc<Semaphore>,
     diag: Diag,
+    /// Queued plus running workspace jobs, published by the worker pool. Orderly completion
+    /// requires it to be zero, so a job that outlived its handler delays exit 0 until it ends.
+    jobs: OnceLock<Arc<AtomicUsize>>,
 }
 
 impl Registry {
@@ -170,7 +176,20 @@ impl Registry {
             admission: Arc::new(Semaphore::new(limits::MAX_ADMITTED)),
             error_budget: Arc::new(Semaphore::new(limits::ERROR_BUDGET)),
             diag,
+            jobs: OnceLock::new(),
         })
+    }
+
+    /// Attaches the worker pool's job counter. Called once at startup when `--root` is given.
+    pub fn attach_jobs(&self, counter: Arc<AtomicUsize>) {
+        let _ = self.jobs.set(counter);
+    }
+
+    fn jobs(&self) -> usize {
+        self.jobs
+            .get()
+            .map(|c| c.load(Ordering::SeqCst))
+            .unwrap_or(0)
     }
 
     pub fn shared(&self) -> &Arc<Shared> {
@@ -237,6 +256,7 @@ impl Registry {
             initialized_outstanding: inner.initialized_outstanding,
             available_permits: self.admission.available_permits(),
             available_error_budget: self.error_budget.available_permits(),
+            jobs: self.jobs(),
         })
     }
 
@@ -1236,8 +1256,9 @@ impl BoundedStdio {
         self.registry.shared().is_fatal() || matches!(*self.control.borrow(), Control::Fatal)
     }
 
-    /// Waits until every delivery record has been acknowledged by the writer, or a fatal cause
-    /// is latched, or the shutdown budget has expired (the supervisor then forces exit 1).
+    /// Waits until every delivery record has been acknowledged by the writer and every workspace
+    /// job has ended, or a fatal cause is latched, or the shutdown budget has expired (the
+    /// supervisor then forces exit 1).
     async fn drain_deliveries(&self) {
         loop {
             let shared = self.registry.shared();
@@ -1245,7 +1266,7 @@ impl BoundedStdio {
                 return;
             }
             let counts = self.registry.counts();
-            if counts.deliveries == 0 {
+            if counts.deliveries == 0 && counts.jobs == 0 {
                 return;
             }
             let deadline = shared.shutdown_deadline_nanos();

@@ -34,6 +34,12 @@ const EOF_WAIT: Duration = Duration::from_secs(3);
 const THREAD_DRAIN: Duration = Duration::from_secs(1);
 /// Maximum request ids kept for response correlation.
 const MAX_PENDING: usize = 1024;
+/// Window in which stdin must stay idle for an open input to count as quiescent at the boundary.
+const QUIESCENCE_MS: u64 = 150;
+/// Time given to the inbound thread to observe EOF after a hang-up at the boundary.
+const EOF_GRACE_MS: u64 = 150;
+/// Time given to frames admitted before the seal to publish before the record set closes.
+const IN_FLIGHT_DRAIN_MS: u64 = 150;
 
 /// Terminal state of a forwarding thread. Anything other than a clean end makes the run incomplete.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -44,6 +50,8 @@ enum Outcome {
     FramingError = 2,
     ReadError = 3,
     ForwardError = 4,
+    /// Input still open at the capture boundary, with no data pending on stdin.
+    Quiescent = 5,
 }
 
 impl Outcome {
@@ -53,6 +61,7 @@ impl Outcome {
             2 => Outcome::FramingError,
             3 => Outcome::ReadError,
             4 => Outcome::ForwardError,
+            5 => Outcome::Quiescent,
             _ => Outcome::Running,
         }
     }
@@ -63,6 +72,7 @@ impl Outcome {
             Outcome::FramingError => "framing_error",
             Outcome::ReadError => "read_error",
             Outcome::ForwardError => "forward_error",
+            Outcome::Quiescent => "quiescent",
         }
     }
 }
@@ -112,6 +122,73 @@ fn wait_flag(flag: &AtomicU8, timeout: Duration) -> bool {
 
 static GOT_SIGNAL: AtomicBool = AtomicBool::new(false);
 static SIGNAL_NO: AtomicUsize = AtomicUsize::new(0);
+
+/// Test hook (development relay only): when this variable names a directory, the inbound thread
+/// pauses after admitting a frame whose bytes contain `PAUSE`, creates `<dir>/waiting`, and resumes
+/// once `<dir>/release` exists. It lets a test place a frame between admission and publication
+/// while finalization runs. Never set outside tests.
+const TEST_PAUSE_DIR: &str = "EVIDENCE_RELAY_TEST_PAUSE_DIR";
+
+fn test_pause_point(buf: &[u8]) {
+    let Ok(dir) = std::env::var(TEST_PAUSE_DIR) else {
+        return;
+    };
+    if !buf.windows(5).any(|w| w == b"PAUSE") {
+        return;
+    }
+    let dir = PathBuf::from(dir);
+    let _ = fs::write(dir.join("waiting"), b"");
+    let deadline = Instant::now() + Duration::from_secs(30);
+    while !dir.join("release").exists() && Instant::now() < deadline {
+        std::thread::sleep(Duration::from_millis(5));
+    }
+}
+
+/// State of stdin at the capture boundary.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum StdinState {
+    /// Nothing arrived within the window.
+    Idle,
+    /// The client closed its end; the inbound thread is about to observe EOF.
+    HangUp,
+    /// Data is pending that was not captured.
+    Data,
+    Error,
+}
+
+fn stdin_state(timeout_ms: u64) -> StdinState {
+    let deadline = Instant::now() + Duration::from_millis(timeout_ms);
+    loop {
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        let mut pfd = libc::pollfd {
+            fd: libc::STDIN_FILENO,
+            events: libc::POLLIN,
+            revents: 0,
+        };
+        // SAFETY: poll on a valid descriptor with a correctly sized array of one entry.
+        let n = unsafe { libc::poll(&mut pfd, 1, remaining.as_millis() as i32) };
+        if n < 0 {
+            // A second signal from the client (SIGTERM after SIGINT) interrupts the poll: retry
+            // until the window ends.
+            if std::io::Error::last_os_error().raw_os_error() == Some(libc::EINTR)
+                && Instant::now() < deadline
+            {
+                continue;
+            }
+            return StdinState::Error;
+        }
+        if n == 0 {
+            return StdinState::Idle;
+        }
+        if (pfd.revents & libc::POLLHUP) != 0 {
+            return StdinState::HangUp;
+        }
+        if (pfd.revents & libc::POLLIN) != 0 {
+            return StdinState::Data;
+        }
+        return StdinState::Idle;
+    }
+}
 
 extern "C" fn on_signal(sig: libc::c_int) {
     SIGNAL_NO.store(sig as usize, Ordering::SeqCst);
@@ -209,8 +286,87 @@ const KNOWN_VERSIONS: &[&str] = &[
     "2026-07-28",
 ];
 
+/// Tool names recorded verbatim; anything else is `other`.
+const KNOWN_TOOLS: &[&str] = &[
+    "connection_probe",
+    "workspace_outline",
+    "file_slice",
+    "text_search",
+];
+
 fn is_nonce_shape(s: &str) -> bool {
     !s.is_empty() && s.len() <= 64 && s.bytes().all(|b| b.is_ascii_alphanumeric())
+}
+
+/// Canonical JSON (docs/evidence/README.md): keys sorted by code point, no whitespace, integers in
+/// decimal, `true`/`false`/`null`, strings escaping only `"`, `\`, and control characters (short
+/// forms for U+0008, U+0009, U+000A, U+000C, U+000D; `\u00xx` lowercase otherwise), everything
+/// else as raw UTF-8. Returns `None` when a number is not an integer.
+pub fn canonical_json(v: &Value, out: &mut String) -> Option<()> {
+    match v {
+        Value::Null => out.push_str("null"),
+        Value::Bool(true) => out.push_str("true"),
+        Value::Bool(false) => out.push_str("false"),
+        Value::Number(n) => {
+            let integer = n
+                .as_i64()
+                .map(|i| i.to_string())
+                .or_else(|| n.as_u64().map(|u| u.to_string()))?;
+            out.push_str(&integer);
+        }
+        Value::String(s) => canonical_string(s, out),
+        Value::Array(items) => {
+            out.push('[');
+            for (i, item) in items.iter().enumerate() {
+                if i > 0 {
+                    out.push(',');
+                }
+                canonical_json(item, out)?;
+            }
+            out.push(']');
+        }
+        Value::Object(map) => {
+            // UTF-8 byte order equals code point order.
+            let mut keys: Vec<&String> = map.keys().collect();
+            keys.sort();
+            out.push('{');
+            for (i, k) in keys.iter().enumerate() {
+                if i > 0 {
+                    out.push(',');
+                }
+                canonical_string(k, out);
+                out.push(':');
+                canonical_json(&map[*k], out)?;
+            }
+            out.push('}');
+        }
+    }
+    Some(())
+}
+
+fn canonical_string(s: &str, out: &mut String) {
+    out.push('"');
+    for ch in s.chars() {
+        match ch {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\u{8}' => out.push_str("\\b"),
+            '\u{c}' => out.push_str("\\f"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+}
+
+/// `(args_sha256, args_bytes)` of a `tools/call` arguments value, or `None` when not canonical.
+pub fn args_digest(arguments: &Value) -> Option<(String, usize)> {
+    let mut canonical = String::new();
+    canonical_json(arguments, &mut canonical)?;
+    Some((sha_prefix(canonical.as_bytes()), canonical.len()))
 }
 
 /// Builds one allowlisted record for a frame. Never persists raw text.
@@ -293,12 +449,23 @@ fn record(
                     let tool = p.get("name").and_then(Value::as_str).unwrap_or("");
                     obj.insert(
                         "tool".into(),
-                        json!(if tool == "connection_probe" {
+                        json!(if KNOWN_TOOLS.contains(&tool) {
                             tool
                         } else {
                             "other"
                         }),
                     );
+                    let arguments = p.get("arguments").cloned().unwrap_or(Value::Null);
+                    match args_digest(&arguments) {
+                        Some((digest, bytes)) => {
+                            obj.insert("args_sha256".into(), json!(digest));
+                            obj.insert("args_bytes".into(), json!(bytes));
+                        }
+                        None => {
+                            obj.insert("args_sha256".into(), Value::Null);
+                            obj.insert("args_canonical".into(), json!(false));
+                        }
+                    }
                     let nonce = p
                         .get("arguments")
                         .and_then(Value::as_object)
@@ -343,8 +510,10 @@ fn record(
         None => {
             if let Some(err) = map.get("error").and_then(Value::as_object) {
                 obj.insert("kind".into(), json!("error"));
-                if let Some(k) = &id_key {
-                    pending.remove(k);
+                let for_call =
+                    id_key.as_ref().and_then(|k| pending.remove(k)) == Some("tools/call");
+                if for_call {
+                    obj.insert("result_sha256".into(), Value::Null);
                 }
                 if let Some(code) = err.get("code").and_then(Value::as_i64) {
                     obj.insert("error_code".into(), json!(code));
@@ -354,9 +523,20 @@ fn record(
                 let for_call =
                     id_key.as_ref().and_then(|k| pending.remove(k)) == Some("tools/call");
                 if for_call && let Some(r) = result.as_object() {
-                    if r.get("isError") == Some(&Value::Bool(true)) {
+                    let is_error = r.get("isError") == Some(&Value::Bool(true));
+                    obj.insert("is_error".into(), json!(is_error));
+                    if is_error {
                         obj.insert("tool_error".into(), json!(true));
                     }
+                    let text = r
+                        .get("content")
+                        .and_then(Value::as_array)
+                        .and_then(|c| c.first())
+                        .and_then(|b| b.get("text"))
+                        .and_then(Value::as_str)
+                        .unwrap_or("");
+                    obj.insert("result_sha256".into(), json!(sha_prefix(text.as_bytes())));
+                    obj.insert("result_bytes".into(), json!(text.len()));
                     if let Some(sc) = r.get("structuredContent").and_then(Value::as_object) {
                         if let Some(iid) = sc.get("instance_id").and_then(Value::as_str)
                             && iid.len() == 32
@@ -415,6 +595,18 @@ fn record(
     rec
 }
 
+/// Capture phases. `Open`: frames are admitted and published. `Sealed`: no new frame is admitted
+/// (late), but frames admitted earlier may still publish while finalization drains them.
+/// `Closed`: nothing may be written; an in-flight frame that reaches publication is dropped and
+/// counted. Every transition and every admission or publication happens under the recorder lock,
+/// so the record set is fixed before it is flushed and recounted.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Phase {
+    Open,
+    Sealed,
+    Closed,
+}
+
 struct Recorder {
     file: BufWriter<File>,
     lines: u64,
@@ -422,9 +614,65 @@ struct Recorder {
     dropped: u64,
     write_error: bool,
     limit_reached: bool,
+    phase: Phase,
+    /// Frames admitted but not yet published.
+    in_flight: u64,
+    /// Frames that arrived after the boundary: never recorded or forwarded.
+    late: u64,
+    /// Frames admitted before the boundary whose publication came after the record set closed.
+    dropped_in_flight: u64,
 }
 
 impl Recorder {
+    fn new(file: File) -> Recorder {
+        Recorder {
+            file: BufWriter::new(file),
+            lines: 0,
+            bytes: 0,
+            dropped: 0,
+            write_error: false,
+            limit_reached: false,
+            phase: Phase::Open,
+            in_flight: 0,
+            late: 0,
+            dropped_in_flight: 0,
+        }
+    }
+
+    /// Admits a frame that was just read. False means the capture boundary has passed: the frame
+    /// is counted as late and must be neither recorded nor forwarded.
+    fn admit(&mut self) -> bool {
+        if self.phase != Phase::Open {
+            self.late += 1;
+            return false;
+        }
+        self.in_flight += 1;
+        true
+    }
+
+    /// Publishes the record of an admitted frame (`None` for a frame with no record, such as an
+    /// empty line). After `Closed`, the frame is dropped and counted instead of written.
+    fn publish(&mut self, rec: Option<&Value>) {
+        if self.phase == Phase::Closed {
+            self.dropped_in_flight += 1;
+        } else if let Some(r) = rec {
+            self.write(r);
+        }
+        self.in_flight = self.in_flight.saturating_sub(1);
+    }
+
+    /// Boundary: no further admissions. Returns the frames still in flight.
+    fn seal(&mut self) -> u64 {
+        self.phase = Phase::Sealed;
+        self.in_flight
+    }
+
+    /// End of the drain: nothing may be written any more. Returns the frames left in flight.
+    fn close(&mut self) -> u64 {
+        self.phase = Phase::Closed;
+        self.in_flight
+    }
+
     fn write(&mut self, rec: &Value) {
         if self.write_error || self.limit_reached {
             self.dropped += 1;
@@ -682,14 +930,7 @@ fn main() {
     manifest["child_pid"] = json!(child.id());
     let _ = write_manifest(&manifest_path, &manifest);
 
-    let recorder = Arc::new(Mutex::new(Recorder {
-        file: BufWriter::new(records_file),
-        lines: 0,
-        bytes: 0,
-        dropped: 0,
-        write_error: false,
-        limit_reached: false,
-    }));
+    let recorder = Arc::new(Mutex::new(Recorder::new(records_file)));
     let expect = args.expect_nonce.clone();
     let pending: Arc<Mutex<Pending>> = Arc::new(Mutex::new(Pending::default()));
     let frames_in = Arc::new(AtomicU64::new(0));
@@ -724,20 +965,30 @@ fn main() {
                     }
                     Err(_) => break Outcome::ReadError,
                 }
+                // Admission under the recorder lock: past the boundary the frame is late and is
+                // neither recorded nor forwarded.
+                if !recorder.lock().unwrap_or_else(|e| e.into_inner()).admit() {
+                    continue;
+                }
+                test_pause_point(&buf);
                 let elapsed = start.elapsed().as_millis() as u64;
                 let trimmed = strip_newline(&buf);
-                if !trimmed.is_empty() {
-                    let rec = record(
+                let rec = if trimmed.is_empty() {
+                    None
+                } else {
+                    Some(record(
                         "in",
                         trimmed,
                         elapsed,
                         expect.as_deref(),
                         &mut pending.lock().unwrap_or_else(|e| e.into_inner()),
-                    );
-                    recorder
-                        .lock()
-                        .unwrap_or_else(|e| e.into_inner())
-                        .write(&rec);
+                    ))
+                };
+                recorder
+                    .lock()
+                    .unwrap_or_else(|e| e.into_inner())
+                    .publish(rec.as_ref());
+                if rec.is_some() {
                     frames_in.fetch_add(1, Ordering::Relaxed);
                 }
                 if child_stdin
@@ -781,20 +1032,27 @@ fn main() {
                     }
                     Err(_) => break Outcome::ReadError,
                 }
+                if !recorder.lock().unwrap_or_else(|e| e.into_inner()).admit() {
+                    continue;
+                }
                 let elapsed = start.elapsed().as_millis() as u64;
                 let trimmed = strip_newline(&buf);
-                if !trimmed.is_empty() {
-                    let rec = record(
+                let rec = if trimmed.is_empty() {
+                    None
+                } else {
+                    Some(record(
                         "out",
                         trimmed,
                         elapsed,
                         expect.as_deref(),
                         &mut pending.lock().unwrap_or_else(|e| e.into_inner()),
-                    );
-                    recorder
-                        .lock()
-                        .unwrap_or_else(|e| e.into_inner())
-                        .write(&rec);
+                    ))
+                };
+                recorder
+                    .lock()
+                    .unwrap_or_else(|e| e.into_inner())
+                    .publish(rec.as_ref());
+                if rec.is_some() {
                     frames_out.fetch_add(1, Ordering::Relaxed);
                 }
                 // The client may stop reading. A blocked write here never blocks finalization,
@@ -870,6 +1128,18 @@ fn main() {
         }
         std::thread::sleep(Duration::from_millis(10));
     }
+    // Capture boundary, synchronized through the recorder lock: seal (no new admissions), drain
+    // the frames admitted before the seal for a bounded time, then close (nothing may be written).
+    // A frame that passed admission is either published before the recount or dropped and
+    // counted after the close; it never appends to the finalized record set.
+    let in_flight_at_seal = recorder.lock().unwrap_or_else(|e| e.into_inner()).seal();
+    let drain_deadline = Instant::now() + Duration::from_millis(IN_FLIGHT_DRAIN_MS);
+    while recorder.lock().unwrap_or_else(|e| e.into_inner()).in_flight > 0
+        && Instant::now() < drain_deadline
+    {
+        std::thread::sleep(Duration::from_millis(2));
+    }
+    let in_flight_unresolved = recorder.lock().unwrap_or_else(|e| e.into_inner()).close();
     // Bounded drain of the forwarding threads. The outbound thread may be blocked writing to a
     // client that stopped reading; the inbound thread may be blocked on an open stdin. Neither may
     // delay finalization beyond THREAD_DRAIN; a thread still running makes the run incomplete and
@@ -878,9 +1148,28 @@ fn main() {
     if outbound_done {
         let _ = outbound.join();
     }
-    let inbound_now = Outcome::from_u8(inbound_outcome.load(Ordering::SeqCst));
+    let mut inbound_now = Outcome::from_u8(inbound_outcome.load(Ordering::SeqCst));
     if inbound_now != Outcome::Running {
         let _ = inbound.join();
+    } else {
+        // Input still open. The boundary is quiescent only when stdin has no data pending within a
+        // short window. A hang-up means the client is closing its end: the inbound thread is given
+        // a moment to observe EOF. Pending data means frames exist that were not captured.
+        match stdin_state(QUIESCENCE_MS) {
+            StdinState::Idle => {
+                inbound_now = Outcome::Quiescent;
+                inbound_outcome.store(Outcome::Quiescent as u8, Ordering::SeqCst);
+            }
+            StdinState::HangUp | StdinState::Data => {
+                // Readable: either EOF (the thread reports clean_eof) or a frame past the boundary
+                // (counted as late; the thread stays running and the run is incomplete).
+                if wait_flag(&inbound_outcome, Duration::from_millis(EOF_GRACE_MS)) {
+                    inbound_now = Outcome::from_u8(inbound_outcome.load(Ordering::SeqCst));
+                    let _ = inbound.join();
+                }
+            }
+            StdinState::Error => {}
+        }
     }
     let outbound_now = Outcome::from_u8(outbound_outcome.load(Ordering::SeqCst));
 
@@ -896,13 +1185,13 @@ fn main() {
     let recount = File::open(&records_path)
         .map(|f| BufReader::new(f).lines().count() as u64)
         .unwrap_or(u64::MAX);
-    let threads_clean =
-        inbound_now == Outcome::CleanEof || (reason == "signal" && inbound_now == Outcome::Running);
+    let threads_clean = matches!(inbound_now, Outcome::CleanEof | Outcome::Quiescent);
     let output_clean = outbound_now == Outcome::CleanEof;
     let complete = orderly
         && status.is_some()
         && threads_clean
         && output_clean
+        && in_flight_unresolved == 0
         && !write_error
         && !limit_reached
         && dropped == 0
@@ -923,6 +1212,10 @@ fn main() {
         "child_output_read_error"
     } else if outbound_now == Outcome::Running {
         "client_output_blocked"
+    } else if in_flight_unresolved > 0 {
+        "frame_in_flight"
+    } else if inbound_now == Outcome::Running {
+        "input_pending"
     } else {
         reason
     };
@@ -932,6 +1225,13 @@ fn main() {
     manifest["outbound_outcome"] = json!(outbound_now.as_str());
     manifest["pending_correlations"] =
         json!(pending.lock().unwrap_or_else(|e| e.into_inner()).len());
+    {
+        let r = recorder.lock().unwrap_or_else(|e| e.into_inner());
+        manifest["late_frames"] = json!(r.late);
+        manifest["in_flight_at_seal"] = json!(in_flight_at_seal);
+        manifest["in_flight_unresolved"] = json!(in_flight_unresolved);
+        manifest["dropped_in_flight"] = json!(r.dropped_in_flight);
+    }
     if !complete {
         eprintln!("evidence-relay: run {run} incomplete: {reason}");
     }
@@ -997,5 +1297,61 @@ fn read_bounded_line<R: Read>(
         if newline {
             return Ok(buf.len());
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn recorder() -> (Recorder, PathBuf) {
+        let path = std::env::temp_dir().join(format!(
+            "evidence-relay-unit-{}-{}.jsonl",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .unwrap();
+        (Recorder::new(file), path)
+    }
+
+    fn lines_on_disk(r: &mut Recorder, path: &Path) -> usize {
+        r.file.flush().unwrap();
+        BufReader::new(File::open(path).unwrap()).lines().count()
+    }
+
+    #[test]
+    fn frames_admitted_before_the_seal_publish_before_the_close_and_never_after() {
+        let (mut r, path) = recorder();
+        assert!(r.admit());
+        r.publish(Some(&json!({"a": 1})));
+        assert_eq!((r.lines, r.in_flight), (1, 0));
+        // Admitted before the seal, published during the drain: included.
+        assert!(r.admit());
+        assert_eq!(r.seal(), 1);
+        r.publish(Some(&json!({"b": 2})));
+        assert_eq!((r.lines, r.in_flight), (2, 0));
+        // Admitted before the seal, published after the close: dropped and counted, not written.
+        let _ = r.close();
+        let (mut r2, path2) = recorder();
+        assert!(r2.admit());
+        assert_eq!(r2.seal(), 1);
+        assert_eq!(r2.close(), 1);
+        r2.publish(Some(&json!({"c": 3})));
+        assert_eq!((r2.lines, r2.in_flight, r2.dropped_in_flight), (0, 0, 1));
+        assert_eq!(lines_on_disk(&mut r2, &path2), 0);
+        // Admission after the seal is late and never published.
+        assert!(!r.admit());
+        assert!(!r2.admit());
+        assert_eq!((r.late, r2.late), (1, 1));
+        assert_eq!(lines_on_disk(&mut r, &path), 2);
+        let _ = fs::remove_file(path);
+        let _ = fs::remove_file(path2);
     }
 }

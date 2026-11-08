@@ -1,0 +1,152 @@
+{
+ "answer_bytes": 863,
+ "answer_sha256": "d3db69c4d849e898",
+ "arm": "B",
+ "attempt": 5,
+ "attribution": "verified",
+ "client": "claude",
+ "client_version": "2.1.319",
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "claimed": 14,
+  "expected": 14,
+  "precision": 1.0,
+  "recall": 1.0,
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 6,
+  "note": null,
+  "reason": null,
+  "repeated_calls": 0,
+  "status": "complete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "claude-fable-5-1",
+ "model_source": "client init line",
+ "native_tool_names": [
+  "ToolSearch"
+ ],
+ "native_tool_uses": 2,
+ "nonce_sha256": "9aaf99cc8ef589b2",
+ "num_turns": 9,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stream.jsonl": {
+   "bytes": 46227,
+   "sha256": "543f4e9414f4fd0f0a1f52fc3a11f347e093944e433267b602cd2830882d3dce"
+  }
+ },
+ "relay": {
+  "complete": true,
+  "frames_in": 8,
+  "frames_out": 8,
+  "present": true,
+  "reason": "orderly",
+  "tools_call_requests": 6
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794091873988,
+ "task": "T1",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [
+  {
+   "args_bytes": 51,
+   "args_sha256": "eefc5157d11a016b",
+   "client_recorded_result_bytes": 415,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 542,
+   "relay_result_text_bytes": 415,
+   "result_sha256": "464671f67e1cd54e",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 75,
+   "args_sha256": "0a302ed10c5d1827",
+   "client_recorded_result_bytes": 225,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 339,
+   "relay_result_text_bytes": 225,
+   "result_sha256": "67c3932f8671b9b6",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 51,
+   "args_sha256": "af98bc06e0fe0aca",
+   "client_recorded_result_bytes": 234,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 349,
+   "relay_result_text_bytes": 234,
+   "result_sha256": "3592219bfbecd78c",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 67,
+   "args_sha256": "710397c4c88d271a",
+   "client_recorded_result_bytes": 261,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 376,
+   "relay_result_text_bytes": 261,
+   "result_sha256": "8e46e6f6023d2fa1",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 51,
+   "args_sha256": "91cf0d0f5ee65266",
+   "client_recorded_result_bytes": 531,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 699,
+   "relay_result_text_bytes": 531,
+   "result_sha256": "0f18234f9c6e0c0f",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 52,
+   "args_sha256": "5afcf5205f90559b",
+   "client_recorded_result_bytes": 525,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 677,
+   "relay_result_text_bytes": 525,
+   "result_sha256": "aed7e2f710753022",
+   "server": "token-saver",
+   "tool": "file_slice"
+  }
+ ],
+ "total_tokens": 116626,
+ "usage": {
+  "cache_read": 101670,
+  "cache_write": 12902,
+  "output": 1924,
+  "uncached_input": 130
+ },
+ "usage_formula": "Claude Code result.usage: uncached_input=input_tokens, cache_write=cache_creation_input_tokens, cache_read=cache_read_input_tokens, output=output_tokens; total=sum",
+ "wall_ms": 42879,
+ "warmup": false
+}

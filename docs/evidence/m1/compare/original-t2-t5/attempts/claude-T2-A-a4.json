@@ -1,0 +1,73 @@
+{
+ "answer_bytes": 20,
+ "answer_sha256": "c37d8e490147c908",
+ "arm": "A",
+ "attempt": 4,
+ "attribution": "not applicable",
+ "client": "claude",
+ "client_version": "2.1.319",
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 0,
+  "reason": "no relay capture",
+  "status": "incomplete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "claude-fable-5-1",
+ "model_source": "client init line",
+ "native_tool_names": [
+  "Grep"
+ ],
+ "native_tool_uses": 1,
+ "nonce_sha256": "72b18f9d104614ad",
+ "num_turns": 2,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stream.jsonl": {
+   "bytes": 13076,
+   "sha256": "ff3ae5781558f3192cb57dad89f3afe73c4c9548c8f281ddafce221a6b9481c4"
+  }
+ },
+ "relay": {
+  "complete": null,
+  "frames_in": null,
+  "frames_out": null,
+  "present": false,
+  "reason": null,
+  "tools_call_requests": 0
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794092462920,
+ "task": "T2",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [],
+ "total_tokens": 55744,
+ "usage": {
+  "cache_read": 45955,
+  "cache_write": 9604,
+  "output": 151,
+  "uncached_input": 34
+ },
+ "usage_formula": "Claude Code result.usage: uncached_input=input_tokens, cache_write=cache_creation_input_tokens, cache_read=cache_read_input_tokens, output=output_tokens; total=sum",
+ "wall_ms": 11547,
+ "warmup": false
+}

@@ -16,12 +16,12 @@ use token_saver::limits;
 use token_saver::probe::{SUPPORTED_VERSIONS_LABEL, TokenSaver, VERSION, new_instance_id};
 use token_saver::supervisor::{self, Cause, Participant, ProcessExit, Shared};
 use token_saver::transport::{BoundedStdio, Registry};
+use token_saver::workspace::Workspace;
 
-const USAGE: &str =
-    "usage: token-saver serve [--diag off|error|info|debug]\n       token-saver --version\n";
+const USAGE: &str = "usage: token-saver serve [--diag off|error|info|debug] [--root /abs/dir]\n       token-saver --version\n";
 
 enum Command {
-    Serve { level: Level },
+    Serve { level: Level, root: Option<String> },
     Version,
     Usage { code: i32 },
 }
@@ -33,6 +33,7 @@ fn parse(args: impl Iterator<Item = String>) -> Command {
         Some("--help") | Some("-h") if args.len() == 1 => Command::Usage { code: 0 },
         Some("serve") => {
             let mut level = Level::Info;
+            let mut root = None;
             let mut i = 1;
             while i < args.len() {
                 match args[i].as_str() {
@@ -46,10 +47,20 @@ fn parse(args: impl Iterator<Item = String>) -> Command {
                         level = parsed;
                         i += 2;
                     }
+                    "--root" => {
+                        let Some(value) = args.get(i + 1) else {
+                            return Command::Usage { code: 2 };
+                        };
+                        if root.is_some() || !value.starts_with('/') {
+                            return Command::Usage { code: 2 };
+                        }
+                        root = Some(value.clone());
+                        i += 2;
+                    }
                     _ => return Command::Usage { code: 2 },
                 }
             }
-            Command::Serve { level }
+            Command::Serve { level, root }
         }
         _ => Command::Usage { code: 2 },
     }
@@ -101,7 +112,7 @@ fn spawn_signal_tasks(shared: Arc<Shared>) {
     });
 }
 
-fn serve(level: Level) -> i32 {
+fn serve(level: Level, root: Option<String>) -> i32 {
     let diag = Diag::start(level);
     let ct = CancellationToken::new();
     let shared = Arc::new(Shared::new(ct.clone(), diag.clone()));
@@ -113,6 +124,36 @@ fn serve(level: Level) -> i32 {
         version: VERSION,
         instance_id: instance_id.clone(),
         supported_versions: SUPPORTED_VERSIONS_LABEL,
+    });
+    // The root is opened once, under the armed startup marker, so a stalled lookup is a startup
+    // stall (exit 4). A refusal is reported as the `root.refused` diagnostic; the textual path is
+    // never emitted.
+    let root_fd = match root {
+        None => None,
+        Some(path) => match token_saver::workspace::confine::acquire_root(&shared, || {
+            token_saver::workspace::confine::open_root(&path)
+        }) {
+            Ok(fd) => Some(fd),
+            Err(_) => {
+                diag.emit(Event::RootRefused);
+                std::thread::sleep(Duration::from_millis(20));
+                return 2;
+            }
+        },
+    };
+    let workspace = root_fd.map(|fd| {
+        let ws = Workspace::with_fs(
+            Arc::new(token_saver::workspace::confine::RealFs),
+            fd,
+            shared.clone(),
+            diag.clone(),
+        );
+        registry.attach_jobs(ws.jobs_counter());
+        diag.emit(Event::WorkspaceRoot {
+            workers: limits::WORKERS,
+            slots: limits::JOB_SLOTS,
+        });
+        Arc::new(ws)
     });
 
     let runtime = match tokio::runtime::Builder::new_current_thread()
@@ -130,7 +171,10 @@ fn serve(level: Level) -> i32 {
         spawn_signal_tasks(shared.clone());
         let transport = BoundedStdio::stdio(registry.clone());
         shared.clear_txn(Participant::Startup);
-        let handler = TokenSaver::new(registry.clone(), instance_id);
+        let mut handler = TokenSaver::new(registry.clone(), instance_id);
+        if let Some(ws) = workspace {
+            handler = handler.with_workspace(ws);
+        }
         match handler.serve_with_ct(transport, ct.clone()).await {
             Ok(running) => {
                 let _ = running.waiting().await;
@@ -149,7 +193,7 @@ fn serve(level: Level) -> i32 {
                 break shared.exit_code(false);
             }
             let counts = registry.counts();
-            if counts.requests == 0 && counts.deliveries == 0 {
+            if counts.requests == 0 && counts.deliveries == 0 && counts.jobs == 0 {
                 break shared.exit_code(false);
             }
             let deadline = shared.shutdown_deadline_nanos();
@@ -181,7 +225,7 @@ fn main() {
             write_stderr(USAGE);
             code
         }
-        Command::Serve { level } => serve(level),
+        Command::Serve { level, root } => serve(level, root),
     };
     std::process::exit(code)
 }

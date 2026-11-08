@@ -21,6 +21,7 @@ use tokio_util::sync::CancellationToken;
 use crate::diag::Event;
 use crate::limits;
 use crate::transport::{HandlerContext, Registry};
+use crate::workspace::{self, Workspace};
 
 pub const SERVER_NAME: &str = "token-saver";
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -28,6 +29,7 @@ pub const TOOL_NAME: &str = "connection_probe";
 pub const TOOL_TITLE: &str = "Connection probe";
 pub const TOOL_DESCRIPTION: &str = "Confirms that the token-saver MCP server is reachable. Use this when asked to probe, test, or verify the token-saver connection. Pass a nonce of 1 to 64 ASCII letters or digits; the result echoes it with the server's instance_id, server_version, and status. It reads nothing and changes nothing.";
 pub const INSTRUCTIONS: &str = "token-saver exposes one read-only tool, connection_probe. Call it with a nonce of 1 to 64 ASCII letters or digits. The result echoes the nonce and reports instance_id, server_version, and status. Use it only to confirm this server is reachable; it reads nothing and changes nothing.";
+pub const INSTRUCTIONS_WITH_ROOT: &str = "token-saver exposes four read-only tools. connection_probe confirms reachability. workspace_outline lists the project tree compactly, file_slice returns a bounded range of lines from one file, and text_search finds a literal string grep-style. All three read only below the configured root, never follow symlinks, and return compact text plus metadata. Prefer them over printing whole files: outline first, then search to locate, then slice to read the lines you need.";
 pub const SUPPORTED_VERSIONS_LABEL: &str = "2025-11-25,2026-07-28";
 
 /// Asserted by tests to equal `limits::SUPPORTED_PROTOCOL_VERSIONS`.
@@ -190,6 +192,7 @@ where
 pub struct TokenSaver {
     registry: Arc<Registry>,
     instance_id: String,
+    workspace: Option<Arc<Workspace>>,
 }
 
 impl TokenSaver {
@@ -197,11 +200,26 @@ impl TokenSaver {
         TokenSaver {
             registry,
             instance_id,
+            workspace: None,
         }
+    }
+
+    /// Adds the Workspace Reading Pack. Without it the handler is byte-identical to Milestone 0.
+    pub fn with_workspace(mut self, workspace: Arc<Workspace>) -> TokenSaver {
+        self.workspace = Some(workspace);
+        self
     }
 
     pub fn instance_id(&self) -> &str {
         &self.instance_id
+    }
+
+    /// Processing deadline for a handler, from admission.
+    fn deadline_of(ctx: Option<&HandlerContext>) -> Instant {
+        match ctx {
+            Some(c) => c.admit_at + limits::PROCESSING,
+            None => Instant::now() + limits::PROCESSING,
+        }
     }
 }
 
@@ -209,7 +227,14 @@ impl ServerHandler for TokenSaver {
     fn get_info(&self) -> ServerConfig {
         let mut config = ServerConfig::new(ServerCapabilities::builder().enable_tools().build());
         config.server_info = Implementation::new(SERVER_NAME, VERSION);
-        config.instructions = Some(INSTRUCTIONS.to_owned());
+        config.instructions = Some(
+            if self.workspace.is_some() {
+                INSTRUCTIONS_WITH_ROOT
+            } else {
+                INSTRUCTIONS
+            }
+            .to_owned(),
+        );
         config
     }
 
@@ -222,7 +247,11 @@ impl ServerHandler for TokenSaver {
         _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
     ) -> Result<ListToolsResult, McpError> {
-        Ok(ListToolsResult::with_all_items(vec![tool()]))
+        let mut tools = vec![tool()];
+        if self.workspace.is_some() {
+            tools.extend(workspace::tools());
+        }
+        Ok(ListToolsResult::with_all_items(tools))
     }
 
     async fn call_tool(
@@ -231,7 +260,22 @@ impl ServerHandler for TokenSaver {
         context: RequestContext<RoleServer>,
     ) -> Result<CallToolResponse, McpError> {
         if request.name != TOOL_NAME {
-            return Err(McpError::invalid_params("tool not found", None));
+            let Some(ws) = self
+                .workspace
+                .as_ref()
+                .filter(|_| workspace::is_tool(&request.name))
+            else {
+                return Err(McpError::invalid_params("tool not found", None));
+            };
+            let handler_ctx = self.registry.handler_context(&context.id);
+            let deadline = Self::deadline_of(handler_ctx.as_ref());
+            let ws = ws.clone();
+            let name = request.name.to_string();
+            let work =
+                async move { Ok(ws.call(&name, request.arguments.as_ref(), deadline).await) };
+            let result = run_with_deadline(handler_ctx, context.ct.clone(), work).await;
+            self.registry.handler_finished(&context.id);
+            return result.map(Into::into);
         }
         let handler_ctx = self.registry.handler_context(&context.id);
         let instance_id = self.instance_id.clone();

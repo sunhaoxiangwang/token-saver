@@ -2,21 +2,32 @@
 
 ## What the server holds
 
-Nothing privileged. It reads no files, no environment variables, and no configuration; opens no
-sockets; spawns no processes; keeps no state beyond process lifetime. Its only exposures are CPU and
-memory on the host and the four probe fields, which exclude hostname, user, paths, process id, and
-environment.
+Without `--root`: nothing privileged. It reads no files, no environment variables, and no
+configuration; opens no sockets; spawns no processes; keeps no state beyond process lifetime. Its
+only exposures are CPU and memory on the host and the four probe fields, which exclude hostname,
+user, paths, process id, and environment.
+
+With `--root`: one directory descriptor, opened once at startup, and the retained-directory
+authority it confers (`docs/adr/0002-retained-directory-authority.md`): the workspace tools read
+regular files and list directories that are, at the instant of each open, direct children of a
+directory object a job holds, starting from the root. Symlinks are never followed, special files are
+never read, writes and execution do not exist, and nothing is retained between jobs. The textual
+root never appears in results or diagnostics. The content below the root reaches the model and, for
+ChatGPT, OpenAI: declare project roots only, never a home directory, and ChatGPT roots only with
+content you would upload. The exclusion and denial lists of `docs/tools.md` are documented guards
+(TS-M1-REVIEW-002, D2), not a guarantee that no secret inside a root is readable.
 
 ## Trust boundaries
 
 | Path | Who can reach the process | Authority granted |
 |---|---|---|
-| Claude Code, stdio | the local Claude Code process that spawned it | none beyond the probe |
-| Codex CLI, stdio | the local Codex process | none beyond the probe |
-| ChatGPT Web via tunnel-client | any ChatGPT user in the owning workspace who can install the plugin, through OpenAI infrastructure and the local helper | none beyond the probe |
+| Claude Code, stdio | the local Claude Code process that spawned it | none beyond the probe; with `--root`, read access below the declared root under the authority contract |
+| Codex CLI, stdio | the local Codex process | the same |
+| ChatGPT Web via tunnel-client | any ChatGPT user in the owning workspace who can install the plugin, through OpenAI infrastructure and the local helper | the same; content read below a ChatGPT root leaves the machine |
 
-Client-provided identity (`clientInfo`), `_meta`, and roots are never used for decisions and are
-not echoed. The only client value that appears in a result is the validated nonce.
+Client-provided identity (`clientInfo`), `_meta`, and MCP roots are never used for decisions and are
+not echoed. The only client values that appear in a result are the validated nonce (probe) and the
+content and names read below the declared root (workspace tools); arguments are never echoed.
 
 ## Launch environment, from pinned sources and documentation
 
@@ -53,11 +64,13 @@ project trust prompt and no committed configuration are involved. Codex configur
 ## Diagnostics and evidence policy
 
 Diagnostics carry fixed fields only, never ids, method strings outside the known set, reason text,
-or payload; the SDK's log events are disabled wholesale. The evidence relay persists allowlisted
-fields only, hashes any value it must correlate, persists a nonce only when it equals the operator's
-expected nonce for that run, never persists client name or version, and marks a run complete only
-after an orderly end with every record flushed and recounted. Raw client artifacts are temporary
-evidence under the operator's control, summarized and hashed, then deleted.
+paths, names, or payload; the SDK's log events are disabled wholesale. The evidence relay persists
+allowlisted fields only, hashes any value it must correlate (request ids, tool arguments as a
+canonical-JSON digest, result text as a digest with its byte size), persists a nonce only when it
+equals the operator's expected nonce for that run, never persists client name or version, and marks a
+run complete only after an orderly end with every record flushed and recounted. Raw client
+artifacts are temporary traces under the operator's control: hashed, reduced to sanitized records,
+scanned for canaries, the fixture path, the home directory, and account identifiers, then deleted.
 
 ## Threat model
 
@@ -80,3 +93,9 @@ evidence under the operator's control, summarized and hashed, then deleted.
 | T15 | deadline bypass by uncooperative work | handler ignores tokens | supervisor forces exit at 10 s | none |
 | T16 | stalled registry or runtime | lock held, blocked thread | transaction markers, published deadlines, exit without locks | none |
 | T17 | id confusion after timeout | reuse | ids owned until retirement, duplicates terminate | none |
+| T18 | path escape from the root | `..`, absolute paths, symlinks, component replacement | lexical validation; descriptor-relative single-component `openat` with `O_NOFOLLOW`; classification before open; `fstat` after open | retained-directory authority: a directory held by a running job and moved out of the root stays readable to that job until the job ends (C8); move-in and hard links inside the root are inside |
+| T19 | secret exposure inside a root | `.env`, keys, credentials | denial list, exclusion list, operator guidance (project roots only) | the lists are guards, not a guarantee |
+| T20 | blocking on special files | FIFOs, sockets, devices | `fstatat` classification before any open; every open `O_NONBLOCK|O_NOCTTY`; a raced special file is identified by `fstat` and closed unread (C9 to C11) | none observed; device nodes need privilege to create |
+| T21 | blocking work outliving its handler | slow or stalled reads | owned workers, job slots released at completion, orphans counted, step marker 2 s and job marker deadline + 2.5 s latch `worker_stall` (S1 to S7) | a step admitted before the latch may finish after it |
+| T22 | stalled filesystem | network volume, hung device | step budget 2 s from the step's start, exit 4 | the process ends, as for every stall in Milestone 0 |
+| T23 | oversized or content-leaking results | long lines, control characters, deep paths | bounded construction under a 12,288-byte result cap with exact escaped-length accounting; metadata never carries content, names, or arguments; generated paths bounded like arguments | none |

@@ -45,6 +45,8 @@ pub enum Cause {
     UptimeLimit = 14,
     // Initialization failure reported by the SDK: exit code 5.
     InitializeFailed = 15,
+    /// A workspace worker exceeded its step budget or its job grace: exit code 4.
+    WorkerStall = 16,
 }
 
 impl Cause {
@@ -65,6 +67,7 @@ impl Cause {
             13 => Cause::Invariant,
             14 => Cause::UptimeLimit,
             15 => Cause::InitializeFailed,
+            16 => Cause::WorkerStall,
             _ => Cause::None,
         }
     }
@@ -85,7 +88,8 @@ impl Cause {
             | Cause::WriteError
             | Cause::ReadError
             | Cause::Invariant
-            | Cause::UptimeLimit => 4,
+            | Cause::UptimeLimit
+            | Cause::WorkerStall => 4,
             Cause::InitializeFailed => 5,
         }
     }
@@ -108,6 +112,7 @@ impl Cause {
             Cause::Invariant => "invariant",
             Cause::UptimeLimit => "uptime_limit",
             Cause::InitializeFailed => "initialize_failed",
+            Cause::WorkerStall => "worker_stall",
         }
     }
 }
@@ -166,12 +171,27 @@ pub enum Participant {
     Startup = 3,
 }
 
+/// First marker index owned by workspace workers; each worker owns two consecutive markers.
+pub const WORKER_MARKERS_BASE: usize = 4;
+/// Total marker count: four participants plus a step and a job marker per worker.
+pub const MARKERS: usize = WORKER_MARKERS_BASE + 2 * limits::WORKERS;
+
+/// Marker index for a worker's current step.
+pub fn worker_step_marker(worker: usize) -> usize {
+    WORKER_MARKERS_BASE + 2 * worker
+}
+
+/// Marker index for a worker's current job.
+pub fn worker_job_marker(worker: usize) -> usize {
+    WORKER_MARKERS_BASE + 2 * worker + 1
+}
+
 /// State shared between the registry, the supervisor, and `main`.
 pub struct Shared {
     start: Instant,
     next_deadline: AtomicU64,
     shutdown_deadline: AtomicU64,
-    txn: [AtomicU64; 4],
+    txn: [AtomicU64; MARKERS],
     fatal_cause: AtomicU8,
     orderly: AtomicU8,
     ct: CancellationToken,
@@ -184,7 +204,7 @@ pub struct Snapshot {
     pub now: u64,
     pub next_deadline: u64,
     pub shutdown_deadline: u64,
-    pub txn: [u64; 4],
+    pub txn: [u64; MARKERS],
     pub fatal: Cause,
     pub orderly: Trigger,
 }
@@ -203,12 +223,7 @@ impl Shared {
             start: Instant::now(),
             next_deadline: AtomicU64::new(0),
             shutdown_deadline: AtomicU64::new(0),
-            txn: [
-                AtomicU64::new(0),
-                AtomicU64::new(0),
-                AtomicU64::new(0),
-                AtomicU64::new(0),
-            ],
+            txn: std::array::from_fn(|_| AtomicU64::new(0)),
             fatal_cause: AtomicU8::new(0),
             orderly: AtomicU8::new(0),
             ct,
@@ -244,6 +259,27 @@ impl Shared {
     /// Clears a transaction marker after the lock is released.
     pub fn clear_txn(&self, p: Participant) {
         self.txn[p as usize].store(0, Ordering::SeqCst);
+    }
+
+    /// True while a participant's marker is armed.
+    pub fn txn_armed(&self, p: Participant) -> bool {
+        self.txn[p as usize].load(Ordering::SeqCst) != 0
+    }
+
+    /// Arms a worker marker with a budget measured from now (step markers).
+    pub fn arm_marker(&self, index: usize, budget: Duration) {
+        let deadline = self.now_nanos().saturating_add(budget.as_nanos() as u64);
+        self.txn[index].store(deadline.max(1), Ordering::SeqCst);
+    }
+
+    /// Arms a worker marker at an absolute instant (job markers).
+    pub fn arm_marker_at(&self, index: usize, at: Instant) {
+        self.txn[index].store(self.instant_to_nanos(at).max(1), Ordering::SeqCst);
+    }
+
+    /// Clears a worker marker.
+    pub fn clear_marker(&self, index: usize) {
+        self.txn[index].store(0, Ordering::SeqCst);
     }
 
     /// Publishes the earliest outstanding deadline as one packed word.
@@ -334,12 +370,7 @@ impl Shared {
             now: self.now_nanos(),
             next_deadline: self.next_deadline.load(Ordering::SeqCst),
             shutdown_deadline: self.shutdown_deadline.load(Ordering::SeqCst),
-            txn: [
-                self.txn[0].load(Ordering::SeqCst),
-                self.txn[1].load(Ordering::SeqCst),
-                self.txn[2].load(Ordering::SeqCst),
-                self.txn[3].load(Ordering::SeqCst),
-            ],
+            txn: std::array::from_fn(|i| self.txn[i].load(Ordering::SeqCst)),
             fatal: self.fatal(),
             orderly: self.orderly(),
         }
@@ -383,6 +414,11 @@ pub fn evaluate(s: &Snapshot) -> Decision {
         let marker = s.txn[p as usize];
         if marker != 0 && s.now >= marker {
             return Decision::Latch(Cause::RegistryStall);
+        }
+    }
+    for marker in &s.txn[WORKER_MARKERS_BASE..MARKERS] {
+        if *marker != 0 && s.now >= *marker {
+            return Decision::Latch(Cause::WorkerStall);
         }
     }
     if let Some((nanos, kind)) = decode(s.next_deadline)
@@ -447,7 +483,7 @@ mod tests {
             now,
             next_deadline: 0,
             shutdown_deadline: 0,
-            txn: [0; 4],
+            txn: [0; MARKERS],
             fatal: Cause::None,
             orderly: Trigger::None,
         }
@@ -497,8 +533,25 @@ mod tests {
         s.txn[Participant::Startup as usize] = 8;
         assert_eq!(evaluate(&s), Decision::Latch(Cause::StartupStall));
         s.next_deadline = encode(11, DeadlineKind::Delivery).unwrap();
-        s.txn = [0; 4];
+        s.txn = [0; MARKERS];
         assert_eq!(evaluate(&s), Decision::Continue);
+    }
+
+    #[test]
+    fn worker_markers_latch_worker_stall_after_registry_markers() {
+        let mut s = snap(10);
+        s.txn[worker_step_marker(0)] = 9;
+        assert_eq!(evaluate(&s), Decision::Latch(Cause::WorkerStall));
+        s.txn[worker_job_marker(limits::WORKERS - 1)] = 5;
+        assert_eq!(evaluate(&s), Decision::Latch(Cause::WorkerStall));
+        s.txn[Participant::Writer as usize] = 7;
+        assert_eq!(evaluate(&s), Decision::Latch(Cause::RegistryStall));
+        s.txn = [0; MARKERS];
+        s.txn[worker_job_marker(1)] = 11;
+        assert_eq!(evaluate(&s), Decision::Continue);
+        assert_eq!(Cause::WorkerStall.exit_code(), 4);
+        assert_eq!(Cause::from_u8(16), Cause::WorkerStall);
+        assert_eq!(Cause::WorkerStall.as_str(), "worker_stall");
     }
 
     #[test]

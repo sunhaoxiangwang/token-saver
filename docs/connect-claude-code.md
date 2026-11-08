@@ -44,6 +44,33 @@ claude --strict-mcp-config --mcp-config "$TMP/mcp.json" --settings "$TMP/setting
    spawned (no new relay run). Re-enable; in a fresh session the tool is present again.
 4. Disconnect and reconnect: `/mcp` Reconnect yields a new `instance_id`.
 
+## Workspace Reading Pack (Milestone 1)
+
+Add `--root /abs/project` to the server command in the temporary configuration or the persistent
+registration; `/abs/project` is the directory the tools may read. Claude Code lists the three tools
+as `mcp__token-saver__workspace_outline`, `mcp__token-saver__file_slice`, and
+`mcp__token-saver__text_search`; they are deferred and loaded through `ToolSearch` like every MCP
+tool in this version.
+
+Observed with Claude Code 2.1.319 on 2026-11-07: when a tool result carries `structuredContent`, the
+client hands the model that JSON and drops the text block. The workspace tools therefore return text
+only with a final `#` metadata line (`docs/tools.md`). Also observed: `claude -p --max-turns 12` did
+not bound a run that reported 65 turns; the harness relies on its 180 s timeout instead.
+
+Automated verification (`tools/token-compare/compare.py proof --client claude`): one `claude -p`
+run with the relay and the hook, in a fresh fixture copy, asked to call each tool once and to
+provoke two tool errors. Evidence per call: the client's `tool_use` input and `tool_result` content
+as digests (`args_sha256`, `result_sha256`) in the attempt record and the hook extract, matched in
+order against the relay's request and response digests; the relay manifest `complete: true`; the
+retained record scanned for canaries, the fixture path, the home directory, and e-mail addresses.
+Observed: the `PostToolUse` hook fired for the three successful calls and not for the two calls
+whose result was a tool error (`isError: true`), so the hook extract covers successful calls only;
+the stream and the relay cover every call. Results: `docs/evidence/m1/proofs/`.
+
+The comparison arms are described in `docs/benchmark-methodology.md`; arm B disallows `Read`,
+`Grep`, `Glob`, `Bash`, `LS`, and the editing and web tools through `--disallowedTools`, so
+compliance is enforced by the client and audited from the stream.
+
 ## Persistent installation, operator
 
 ```

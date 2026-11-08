@@ -1,0 +1,91 @@
+{
+ "answer_bytes": 635,
+ "answer_sha256": "c50ddbcebbd29d86",
+ "arm": "B",
+ "attempt": 1,
+ "attribution": "verified",
+ "client": "claude",
+ "client_version": "2.1.319",
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "claimed": 12,
+  "expected": 12,
+  "matched": 12,
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 1,
+  "note": null,
+  "reason": null,
+  "repeated_calls": 0,
+  "status": "complete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "claude-fable-5-1",
+ "model_source": "client init line",
+ "native_tool_names": [
+  "ToolSearch"
+ ],
+ "native_tool_uses": 1,
+ "nonce_sha256": "d2901366778c7d8a",
+ "num_turns": 3,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stream.jsonl": {
+   "bytes": 22422,
+   "sha256": "81579039dc27bb899cb1ef856489e002ee88624531897734f904510e6545c954"
+  }
+ },
+ "relay": {
+  "complete": true,
+  "frames_in": 3,
+  "frames_out": 3,
+  "present": true,
+  "reason": "orderly",
+  "tools_call_requests": 1
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794093203871,
+ "task": "T4",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [
+  {
+   "args_bytes": 107,
+   "args_sha256": "062eaefd8d666d7c",
+   "client_recorded_result_bytes": 1385,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 1546,
+   "relay_result_text_bytes": 1385,
+   "result_sha256": "ecfaa33a0f7f7022",
+   "server": "token-saver",
+   "tool": "text_search"
+  }
+ ],
+ "total_tokens": 68806,
+ "usage": {
+  "cache_read": 56475,
+  "cache_write": 11549,
+  "output": 716,
+  "uncached_input": 66
+ },
+ "usage_formula": "Claude Code result.usage: uncached_input=input_tokens, cache_write=cache_creation_input_tokens, cache_read=cache_read_input_tokens, output=output_tokens; total=sum",
+ "wall_ms": 17520,
+ "warmup": false
+}

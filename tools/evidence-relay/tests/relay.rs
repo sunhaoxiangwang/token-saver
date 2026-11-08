@@ -3,6 +3,7 @@
 
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
+use std::os::unix::process::ExitStatusExt;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant};
@@ -203,6 +204,59 @@ fn signal_is_forwarded_and_child_is_reaped_with_status_preserved() {
         "orderly signal shutdown with no records lost: {m}"
     );
     assert_eq!(m["child_exit"]["signal"], 15);
+    // The input was open but idle at the capture boundary.
+    assert_eq!(m["inbound_outcome"], "quiescent");
+    assert_eq!(m["late_frames"], 0);
+}
+
+#[test]
+fn input_after_the_capture_boundary_is_late_or_pending_never_silently_complete() {
+    let out = tmpdir("late-input");
+    let mut relay = spawn_relay(&out, None, &["/bin/sleep", "30"]);
+    wait_ready(&out, 1, Duration::from_secs(5));
+    let mut stdin = relay.stdin.take().unwrap();
+    std::thread::sleep(Duration::from_millis(50));
+    unsafe {
+        libc::kill(relay.id() as libc::pid_t, libc::SIGTERM);
+    }
+    // Written while the relay finalizes: either read after the boundary (late, not recorded) or
+    // still pending on stdin (the capture is incomplete). It is never recorded as part of a
+    // complete capture.
+    for _ in 0..20 {
+        let _ = writeln!(
+            stdin,
+            "{}",
+            json!({"jsonrpc":"2.0","id":"LATE_CANARY_55","method":"tools/call","params":{"name":"text_search","arguments":{"query":"LATE_CANARY_55"}}})
+        );
+        let _ = stdin.flush();
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let _ = wait_exit(&mut relay, Duration::from_secs(5)).expect("relay exits after signal");
+    let m = manifest(&out, 1);
+    let recs = records(&out, 1);
+    let late = m["late_frames"].as_u64().unwrap_or(0);
+    let recorded_late = recs.iter().filter(|r| r["method"] == "tools/call").count() as u64;
+    if m["complete"] == true {
+        assert!(
+            m["inbound_outcome"] == "quiescent" || m["inbound_outcome"] == "clean_eof",
+            "{m}"
+        );
+        assert_eq!(
+            recorded_late, 0,
+            "frames after the boundary must not be recorded: {m}"
+        );
+    } else {
+        assert!(
+            m["reason"] == "input_pending" || m["reason"] == "forward_to_child_failed",
+            "{m}"
+        );
+    }
+    assert!(
+        late > 0 || recorded_late > 0 || m["complete"] == false,
+        "{m}"
+    );
+    let text = fs::read_to_string(out.join("run-1.records.jsonl")).unwrap();
+    assert!(!text.contains("LATE_CANARY_55"));
 }
 
 #[test]
@@ -344,4 +398,258 @@ fn correlation_state_is_bounded_and_retires_on_errors() {
     let m = manifest(&out, 1);
     assert_eq!(m["pending_correlations"], 0, "{m}");
     assert_eq!(m["complete"], true, "{m}");
+}
+
+// ----- Milestone 1: digests, canonical vectors, canary exclusion for workspace tools ---------
+
+/// Sends frames through the echo relay and returns its records.
+fn echo_records(name: &str, frames: &[Value]) -> (Vec<Value>, String) {
+    let out = tmpdir(name);
+    let mut relay = spawn_relay(&out, Some("abc123"), &["/bin/cat"]);
+    let mut stdin = relay.stdin.take().unwrap();
+    for f in frames {
+        writeln!(stdin, "{f}").unwrap();
+    }
+    stdin.flush().unwrap();
+    drop(stdin);
+    let status = wait_exit(&mut relay, Duration::from_secs(10)).expect("relay exits after EOF");
+    assert_eq!(status.code(), Some(0));
+    assert_eq!(manifest(&out, 1)["complete"], true);
+    let text = fs::read_to_string(out.join("run-1.records.jsonl")).unwrap();
+    (records(&out, 1), text)
+}
+
+#[test]
+fn canonical_argument_digests_match_the_plan_vectors() {
+    // (arguments, canonical byte length, args_sha256) from TS-M1-PLAN-001 revision 4, section 7.3.
+    let vectors: Vec<(Value, usize, &str)> = vec![
+        (json!({}), 2, "44136fa355b3678a"),
+        (json!({"path": ""}), 11, "518341a7f82a2945"),
+        (
+            json!({"max_lines": 60, "path": "src/main.rs", "start_line": 1}),
+            52,
+            "addece581e7e5c6f",
+        ),
+        (
+            json!({"path": "src/main.rs", "start_line": 1, "max_lines": 60}),
+            52,
+            "addece581e7e5c6f",
+        ),
+        (
+            json!({"case_sensitive": false, "context_lines": 0, "query": "outbound_too_large"}),
+            71,
+            "22d8cd22e833ca09",
+        ),
+        (
+            json!({"max_bytes": 256, "path": "docs/été/日本.md"}),
+            47,
+            "78bbd623f9a8a6d3",
+        ),
+        (
+            json!({"max_matches": 100, "query": "tab\there \"quoted\" back\\slash \u{1}ctl"}),
+            72,
+            "22d9e5e171640ea5",
+        ),
+        (
+            json!({"depth": 3, "include_hidden": true, "max_entries": 200, "path": "a"}),
+            62,
+            "096afd0e9fb660cb",
+        ),
+        (
+            json!({"b": {"z": [1, 2, {"y": null}], "a": "x"}, "A": "upper sorts first", "é": "non-ascii key"}),
+            81,
+            "77c4c3da126e8539",
+        ),
+    ];
+    let frames: Vec<Value> = vectors
+        .iter()
+        .enumerate()
+        .map(|(i, (args, _, _))| {
+            json!({"jsonrpc":"2.0","id":i,"method":"tools/call","params":{"name":"workspace_outline","arguments":args}})
+        })
+        .collect();
+    let (recs, _) = echo_records("vectors", &frames);
+    let inbound: Vec<&Value> = recs
+        .iter()
+        .filter(|r| r["dir"] == "in" && r["method"] == "tools/call")
+        .collect();
+    assert_eq!(inbound.len(), vectors.len());
+    for (rec, (args, bytes, digest)) in inbound.iter().zip(&vectors) {
+        assert_eq!(rec["args_sha256"], *digest, "{args}");
+        assert_eq!(rec["args_bytes"], *bytes, "{args}");
+        assert_eq!(rec["tool"], "workspace_outline");
+    }
+    // A non-integer number cannot be canonicalized: digest null, flagged.
+    let (recs, _) = echo_records(
+        "noncanonical",
+        &[
+            json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"file_slice","arguments":{"path":"a","start_line":1.5}}}),
+        ],
+    );
+    let r = recs.iter().find(|r| r["dir"] == "in").unwrap();
+    assert!(r["args_sha256"].is_null());
+    assert_eq!(r["args_canonical"], false);
+}
+
+#[test]
+fn workspace_tool_responses_record_result_digests_and_never_content() {
+    let canary_dir = "CANARY_DIR_7f3a";
+    let canary_content = "CANARY_CONTENT_9c1e";
+    let text = format!("d {canary_dir}\nf README.md 1024\n{canary_content}");
+    let expected_digest = {
+        use sha2::{Digest, Sha256};
+        let d = Sha256::digest(text.as_bytes());
+        d.iter()
+            .take(8)
+            .map(|b| format!("{b:02x}"))
+            .collect::<String>()
+    };
+    let frames = [
+        json!({"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"workspace_outline","arguments":{"path":canary_dir}}}),
+        json!({"jsonrpc":"2.0","id":7,"result":{"content":[{"type":"text","text":text}],"structuredContent":{"entries_listed":2,"truncated":false},"isError":false}}),
+        json!({"jsonrpc":"2.0","id":8,"method":"tools/call","params":{"name":"file_slice","arguments":{"path":canary_dir}}}),
+        json!({"jsonrpc":"2.0","id":8,"result":{"content":[{"type":"text","text":"not found"}],"isError":true}}),
+        json!({"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"text_search","arguments":{"query":canary_content}}}),
+        json!({"jsonrpc":"2.0","id":9,"error":{"code":-32603,"message":"processing deadline exceeded"}}),
+        json!({"jsonrpc":"2.0","id":10,"method":"tools/call","params":{"name":"unknown_tool","arguments":{}}}),
+    ];
+    let (recs, raw) = echo_records("digests", &frames);
+    assert!(
+        !raw.contains(canary_dir) && !raw.contains(canary_content),
+        "canary persisted: {raw}"
+    );
+    assert!(!raw.contains("README"), "entry name persisted");
+    let ok = recs
+        .iter()
+        .find(|r| r["kind"] == "response" && r["dir"] == "in" && r["result_bytes"] == text.len())
+        .expect("outline response record");
+    assert_eq!(ok["result_sha256"], expected_digest);
+    assert_eq!(ok["is_error"], false);
+    assert!(ok.get("instance_id").is_none() && ok.get("status").is_none());
+    let tool_err = recs
+        .iter()
+        .find(|r| r["kind"] == "response" && r["dir"] == "in" && r["is_error"] == true)
+        .expect("tool error record");
+    assert_eq!(tool_err["result_bytes"], "not found".len());
+    assert_eq!(tool_err["tool_error"], true);
+    let proto_err = recs
+        .iter()
+        .find(|r| r["kind"] == "error" && r["dir"] == "in")
+        .expect("protocol error record");
+    assert_eq!(proto_err["error_code"], -32603);
+    assert!(proto_err["result_sha256"].is_null());
+    let unknown = recs
+        .iter()
+        .find(|r| r["dir"] == "in" && r["id_sha256"].is_string() && r["tool"] == "other")
+        .expect("unknown tool recorded as other");
+    assert!(unknown["args_sha256"].is_string());
+    // Every known tool name is recorded verbatim.
+    let names: Vec<&str> = recs
+        .iter()
+        .filter(|r| r["dir"] == "in" && r["method"] == "tools/call")
+        .filter_map(|r| r["tool"].as_str())
+        .collect();
+    assert_eq!(
+        names,
+        ["workspace_outline", "file_slice", "text_search", "other"]
+    );
+}
+
+/// Spawns the relay with the test pause hook, feeds one `PAUSE` frame, and waits until the inbound
+/// thread sits between admission and publication.
+fn spawn_paused_relay(name: &str) -> (PathBuf, PathBuf, Child, std::process::ChildStdin) {
+    let out = tmpdir(name);
+    let pause = tmpdir(&format!("{name}-pause"));
+    fs::create_dir_all(&pause).unwrap();
+    let mut cmd = Command::new(RELAY);
+    cmd.env("EVIDENCE_RELAY_TEST_PAUSE_DIR", &pause)
+        .arg("--out")
+        .arg(&out)
+        .arg("--")
+        .args(["/bin/sleep", "30"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null());
+    let mut relay = cmd.spawn().expect("spawn relay");
+    wait_ready(&out, 1, Duration::from_secs(5));
+    let mut stdin = relay.stdin.take().unwrap();
+    writeln!(
+        stdin,
+        "{}",
+        json!({"jsonrpc":"2.0","id":"PAUSE_FRAME_1","method":"tools/call","params":{"name":"file_slice","arguments":{"path":"a"}}})
+    )
+    .unwrap();
+    stdin.flush().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !pause.join("waiting").exists() && Instant::now() < deadline {
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    assert!(
+        pause.join("waiting").exists(),
+        "inbound thread reached the pause point"
+    );
+    (out, pause, relay, stdin)
+}
+
+fn file_lines(out: &Path) -> u64 {
+    BufReader::new(fs::File::open(out.join("run-1.records.jsonl")).unwrap())
+        .lines()
+        .count() as u64
+}
+
+#[test]
+fn f07_frame_in_flight_released_during_the_drain_is_included_before_the_recount() {
+    let (out, pause, mut relay, _stdin) = spawn_paused_relay("inflight-drain");
+    unsafe {
+        libc::kill(relay.id() as libc::pid_t, libc::SIGTERM);
+    }
+    // Release while finalization drains admitted frames (within IN_FLIGHT_DRAIN_MS).
+    fs::write(pause.join("release"), b"").unwrap();
+    let _ = wait_exit(&mut relay, Duration::from_secs(5)).expect("relay exits");
+    let m = manifest(&out, 1);
+    let recs = records(&out, 1);
+    assert_eq!(m["in_flight_unresolved"], 0, "{m}");
+    assert_eq!(m["dropped_in_flight"], 0);
+    assert_eq!(m["records"], m["records_recount"]);
+    assert_eq!(
+        m["records"].as_u64().unwrap(),
+        file_lines(&out),
+        "no append after recount"
+    );
+    assert_eq!(recs.len() as u64, m["records"].as_u64().unwrap());
+    assert!(
+        recs.iter()
+            .any(|r| r["dir"] == "in" && r["method"] == "tools/call"),
+        "the admitted frame was published before the recount: {recs:?}"
+    );
+}
+
+#[test]
+fn f07_frame_in_flight_held_past_the_drain_is_excluded_and_accounted_for() {
+    let (out, pause, mut relay, _stdin) = spawn_paused_relay("inflight-held");
+    let t0 = Instant::now();
+    unsafe {
+        libc::kill(relay.id() as libc::pid_t, libc::SIGTERM);
+    }
+    // Hold the thread past the drain window; finalization must still end within bounds.
+    let status = wait_exit(&mut relay, Duration::from_secs(5)).expect("bounded termination");
+    assert!(t0.elapsed() < Duration::from_secs(3), "{:?}", t0.elapsed());
+    assert!(status.code().is_some() || status.signal().is_some());
+    fs::write(pause.join("release"), b"").unwrap();
+    let m = manifest(&out, 1);
+    assert_eq!(m["complete"], false, "{m}");
+    assert_eq!(m["reason"], "frame_in_flight");
+    assert_eq!(m["in_flight_at_seal"], 1);
+    assert_eq!(m["in_flight_unresolved"], 1);
+    assert_eq!(m["records"], m["records_recount"]);
+    assert_eq!(
+        m["records"].as_u64().unwrap(),
+        file_lines(&out),
+        "no append after recount"
+    );
+    let text = fs::read_to_string(out.join("run-1.records.jsonl")).unwrap();
+    assert!(
+        !records(&out, 1).iter().any(|r| r["method"] == "tools/call"),
+        "{text}"
+    );
 }

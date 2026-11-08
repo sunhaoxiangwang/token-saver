@@ -1,0 +1,75 @@
+{
+ "answer_bytes": 24,
+ "answer_sha256": "dc5fc4019c239d74",
+ "arm": "A",
+ "attempt": 6,
+ "attribution": "not applicable",
+ "checker_version": 2,
+ "checker_version_note": "graded at run time by the T2 rule of checker version 2 (asserted value and path must be unambiguous and right); the checker_version field was added to records after this rerun started, so it was annotated afterwards on 2026-11-07; no other field was changed",
+ "client": "claude",
+ "client_version": "2.1.319",
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 0,
+  "reason": "no relay capture",
+  "status": "incomplete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "claude-fable-5-1",
+ "model_source": "client init line",
+ "native_tool_names": [
+  "Grep"
+ ],
+ "native_tool_uses": 1,
+ "nonce_sha256": "e5ee7f8efaf02f90",
+ "num_turns": 2,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stream.jsonl": {
+   "bytes": 14413,
+   "sha256": "421cd906d9c1e4af6e47b2263e6f887eaed9298fdd2b3a43e060e32338ea3c79"
+  }
+ },
+ "relay": {
+  "complete": null,
+  "frames_in": null,
+  "frames_out": null,
+  "present": false,
+  "reason": null,
+  "tools_call_requests": 0
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794092636923,
+ "task": "T2",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [],
+ "total_tokens": 55873,
+ "usage": {
+  "cache_read": 45959,
+  "cache_write": 9667,
+  "output": 213,
+  "uncached_input": 34
+ },
+ "usage_formula": "Claude Code result.usage: uncached_input=input_tokens, cache_write=cache_creation_input_tokens, cache_read=cache_read_input_tokens, output=output_tokens; total=sum",
+ "wall_ms": 9778,
+ "warmup": false
+}

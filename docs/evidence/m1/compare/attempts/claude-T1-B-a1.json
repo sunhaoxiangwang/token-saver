@@ -1,0 +1,224 @@
+{
+ "answer_bytes": 1342,
+ "answer_sha256": "0d6df8e4ad4b8435",
+ "arm": "B",
+ "attempt": 1,
+ "attribution": "verified",
+ "client": "claude",
+ "client_version": "2.1.319",
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "claimed": 14,
+  "expected": 14,
+  "precision": 1.0,
+  "recall": 1.0,
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 12,
+  "note": null,
+  "reason": null,
+  "repeated_calls": 0,
+  "status": "complete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "claude-fable-5-1",
+ "model_source": "client init line",
+ "native_tool_names": [
+  "ToolSearch"
+ ],
+ "native_tool_uses": 1,
+ "nonce_sha256": "1e8fb0060cf39b40",
+ "num_turns": 14,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stream.jsonl": {
+   "bytes": 58408,
+   "sha256": "ce0630db6fba9c1debdec9ba0d9a0bb8c82748afda2c7181390a567f3c647c79"
+  }
+ },
+ "relay": {
+  "complete": true,
+  "frames_in": 14,
+  "frames_out": 14,
+  "present": true,
+  "reason": "orderly",
+  "tools_call_requests": 12
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794091719335,
+ "task": "T1",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [
+  {
+   "args_bytes": 51,
+   "args_sha256": "eefc5157d11a016b",
+   "client_recorded_result_bytes": 415,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 542,
+   "relay_result_text_bytes": 415,
+   "result_sha256": "464671f67e1cd54e",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 35,
+   "args_sha256": "81933fec0ee9cacd",
+   "client_recorded_result_bytes": 2198,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 2374,
+   "relay_result_text_bytes": 2198,
+   "result_sha256": "63444b3b31cc29da",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 36,
+   "args_sha256": "13f5abe6cdb5db43",
+   "client_recorded_result_bytes": 1344,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 1597,
+   "relay_result_text_bytes": 1344,
+   "result_sha256": "4e96f530036d7889",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 35,
+   "args_sha256": "24312afbf28e4f8b",
+   "client_recorded_result_bytes": 234,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 349,
+   "relay_result_text_bytes": 234,
+   "result_sha256": "3592219bfbecd78c",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 35,
+   "args_sha256": "9ad37a1b3f5c80b2",
+   "client_recorded_result_bytes": 599,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 782,
+   "relay_result_text_bytes": 599,
+   "result_sha256": "5b6b9243441f2ec8",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 45,
+   "args_sha256": "c7d284988481e057",
+   "client_recorded_result_bytes": 284,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 409,
+   "relay_result_text_bytes": 284,
+   "result_sha256": "e1175feaa191b38b",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 36,
+   "args_sha256": "34b624be57abe8cb",
+   "client_recorded_result_bytes": 352,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 477,
+   "relay_result_text_bytes": 352,
+   "result_sha256": "2461931dba4c205e",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 58,
+   "args_sha256": "ddaf1a1601dbe7e4",
+   "client_recorded_result_bytes": 225,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 339,
+   "relay_result_text_bytes": 225,
+   "result_sha256": "67c3932f8671b9b6",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 25,
+   "args_sha256": "5d54e24b3659f3c1",
+   "client_recorded_result_bytes": 569,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 696,
+   "relay_result_text_bytes": 569,
+   "result_sha256": "0786dc3e4c032a4e",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 24,
+   "args_sha256": "0f57a16b902c7972",
+   "client_recorded_result_bytes": 321,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 441,
+   "relay_result_text_bytes": 321,
+   "result_sha256": "639738372d04402b",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 26,
+   "args_sha256": "5efbb98560eb3fee",
+   "client_recorded_result_bytes": 426,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 549,
+   "relay_result_text_bytes": 426,
+   "result_sha256": "35805d626e254c0c",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 26,
+   "args_sha256": "39e18acf40f449f6",
+   "client_recorded_result_bytes": 216,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 331,
+   "relay_result_text_bytes": 216,
+   "result_sha256": "0405988b983ac15a",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  }
+ ],
+ "total_tokens": 97767,
+ "usage": {
+  "cache_read": 79620,
+  "cache_write": 15821,
+  "output": 2228,
+  "uncached_input": 98
+ },
+ "usage_formula": "Claude Code result.usage: uncached_input=input_tokens, cache_write=cache_creation_input_tokens, cache_read=cache_read_input_tokens, output=output_tokens; total=sum",
+ "wall_ms": 39363,
+ "warmup": false
+}

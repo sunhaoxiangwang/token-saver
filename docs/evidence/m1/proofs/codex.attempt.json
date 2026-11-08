@@ -1,0 +1,152 @@
+{
+ "answer_bytes": 647,
+ "answer_sha256": "4f6e102615d79ab9",
+ "arm": "B",
+ "attempt": 0,
+ "attribution": "verified",
+ "client": "codex",
+ "client_version": null,
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "score": 0.0,
+  "verdict": "not_applicable"
+ },
+ "correlation": {
+  "matched": 5,
+  "note": null,
+  "reason": null,
+  "repeated_calls": 0,
+  "status": "complete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "gpt-6.1-sol",
+ "model_source": "pinned by -c model (Codex reports none)",
+ "native_tool_names": [],
+ "native_tool_uses": 0,
+ "nonce_sha256": "193427f213a496df",
+ "num_turns": 1,
+ "proof": {
+  "all_three_tools": true,
+  "attribution": "verified",
+  "every_call_correlated": true,
+  "tool_error_calls": 2,
+  "tools_called": [
+   "file_slice",
+   "text_search",
+   "workspace_outline"
+  ]
+ },
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 39,
+   "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+  },
+  "stream.jsonl": {
+   "bytes": 6186,
+   "sha256": "45e07be16ae6cd6fc260522056d0d6236c3e67f57dd8ced30c6e7a0f666e7eaa"
+  }
+ },
+ "relay": {
+  "complete": true,
+  "frames_in": 8,
+  "frames_out": 7,
+  "present": true,
+  "reason": "orderly",
+  "tools_call_requests": 5
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794091646031,
+ "task": "PROOF",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [
+  {
+   "args_bytes": 2,
+   "args_sha256": "44136fa355b3678a",
+   "client_recorded_result_bytes": 1189,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_is_error": false,
+   "relay_response_frame_bytes": 1322,
+   "relay_result_text_bytes": 1189,
+   "result_sha256": "5fddf6da014d500a",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  },
+  {
+   "args_bytes": 36,
+   "args_sha256": "cd6e4fb63428818b",
+   "client_recorded_result_bytes": 602,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_is_error": false,
+   "relay_response_frame_bytes": 697,
+   "relay_result_text_bytes": 602,
+   "result_sha256": "d619088e5df728d1",
+   "server": "token-saver",
+   "tool": "text_search"
+  },
+  {
+   "args_bytes": 52,
+   "args_sha256": "2bc897ac0b9ba88a",
+   "client_recorded_result_bytes": 767,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_is_error": false,
+   "relay_response_frame_bytes": 877,
+   "relay_result_text_bytes": 767,
+   "result_sha256": "8e00dd6f979ecb0e",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 28,
+   "args_sha256": "b67982d06bdeb847",
+   "client_recorded_result_bytes": 9,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_is_error": true,
+   "relay_response_frame_bytes": 97,
+   "relay_result_text_bytes": 9,
+   "result_sha256": "907ba78b4545338d",
+   "server": "token-saver",
+   "tool": "file_slice"
+  },
+  {
+   "args_bytes": 11,
+   "args_sha256": "66e41417846f7e02",
+   "client_recorded_result_bytes": 16,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_is_error": true,
+   "relay_response_frame_bytes": 104,
+   "relay_result_text_bytes": 16,
+   "result_sha256": "4d64857e0f1c69d8",
+   "server": "token-saver",
+   "tool": "workspace_outline"
+  }
+ ],
+ "total_tokens": 50428,
+ "usage": {
+  "cache_read": 41216,
+  "cache_write": 0,
+  "codex_input_total": 50044,
+  "output": 384,
+  "reasoning_output": 0,
+  "uncached_input": 8828
+ },
+ "usage_formula": "Codex sum of turn.completed.usage: input_tokens (includes cached), cached_input_tokens, cache_write_input_tokens, output_tokens (includes reasoning); total=input+output",
+ "wall_ms": 17629,
+ "warmup": true
+}

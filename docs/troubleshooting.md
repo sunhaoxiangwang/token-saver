@@ -17,7 +17,15 @@
 | Codex shows no tools | `-c` override parse error, or startup exceeded 10 s | `codex mcp get token-saver`; `RUST_LOG=info` shows "MCP server stderr" lines |
 | `codex exec` never starts MCP servers from a script | stdin is an open pipe; Codex reads it as additional input | redirect `< /dev/null` |
 | `claude -p` prints a stdin warning | same cause | redirect `< /dev/null` |
+| `event=root.refused`, exit 2 | missing directory, a symlink, a file, or an unreadable directory given to `--root` (a relative path is a usage error) | pass the absolute path of a real directory |
+| exit code 4 with `fatal cause=startup_stall` before any response | the root's filesystem did not answer the open within the 3 s startup budget | check the root's filesystem |
+| workspace tool answers `busy` | eight jobs already hold slots, usually orphans of handlers that hit their 5 s deadline | wait; the orphans end at their next step or the process exits 4 |
+| exit code 4 with `fatal cause=worker_stall` | a filesystem step took over 2 s (stalled volume) or a job outlived its handler by 2.5 s | check the root's filesystem; the client restarts the server |
+| `stop_reason: result_cap` or `[truncated: ...]` | the result reached its byte or count bound | narrow the request: smaller `max_lines`, a deeper `path`, a tighter `query` |
+| `-32602 tool not found` for a workspace tool | the server runs without `--root` | add `--root /abs/project` to the client's command |
+| `not readable` | permission denied or an I/O error on the object | check file permissions below the root |
 
 Where diagnostics go: Claude Code captures the server's stderr itself (destination verified during
 bring-up and recorded in the evidence pack); Codex logs each stderr line at `info`; tunnel-client
-forwards stderr to its own stderr. Run the binary by hand with `--diag debug` to see every event.
+forwards stderr to its own stderr. Run the binary by hand with `--diag debug` to see every event. Workspace jobs emit `job.started`,
+`job.finished`, `job.orphaned`, `job.orphan_ended`, and `job.busy` with the job kind only.

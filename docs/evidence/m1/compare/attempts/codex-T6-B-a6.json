@@ -1,0 +1,89 @@
+{
+ "answer_bytes": 526,
+ "answer_sha256": "aab8b59dbee1de5f",
+ "arm": "B",
+ "attempt": 6,
+ "attribution": "verified",
+ "client": "codex",
+ "client_version": null,
+ "commit": "013734d",
+ "completed": true,
+ "compliance": {
+  "reasons": [],
+  "status": "compliant"
+ },
+ "correctness": {
+  "rows": 9,
+  "score": 1.0,
+  "verdict": "correct"
+ },
+ "correlation": {
+  "matched": 1,
+  "note": null,
+  "reason": null,
+  "repeated_calls": 0,
+  "status": "complete"
+ },
+ "exit_code": 0,
+ "failure_stderr_excerpt": null,
+ "model": "gpt-6.1-sol",
+ "model_source": "pinned by -c model (Codex reports none)",
+ "native_tool_names": [],
+ "native_tool_uses": 0,
+ "nonce_sha256": "6aa0e49feaccab2c",
+ "num_turns": 1,
+ "raw_disposition": "hashed and deleted",
+ "raw_traces": {
+  "stderr.txt": {
+   "bytes": 39,
+   "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+  },
+  "stream.jsonl": {
+   "bytes": 8946,
+   "sha256": "cb67c697c052f997463d0c17bad0157c78f84d27c05fa39d20b58ced2b8c5d33"
+  }
+ },
+ "relay": {
+  "complete": true,
+  "frames_in": 4,
+  "frames_out": 3,
+  "present": true,
+  "reason": "orderly",
+  "tools_call_requests": 1
+ },
+ "retention_scan": {
+  "forbidden_strings": 4,
+  "hits": []
+ },
+ "schema": "token-compare attempt record v1",
+ "started_unix_ms": 1794092979304,
+ "task": "T6",
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "timed_out": false,
+ "tool_calls": [
+  {
+   "args_bytes": 44,
+   "args_sha256": "9ce0234c9400a618",
+   "client_recorded_result_bytes": 7338,
+   "is_error": false,
+   "relay_error_code": null,
+   "relay_response_frame_bytes": 7655,
+   "relay_result_text_bytes": 7338,
+   "result_sha256": "104b38215fcb1021",
+   "server": "token-saver",
+   "tool": "file_slice"
+  }
+ ],
+ "total_tokens": 49310,
+ "usage": {
+  "cache_read": 45440,
+  "cache_write": 0,
+  "codex_input_total": 49080,
+  "output": 230,
+  "reasoning_output": 0,
+  "uncached_input": 3640
+ },
+ "usage_formula": "Codex sum of turn.completed.usage: input_tokens (includes cached), cached_input_tokens, cache_write_input_tokens, output_tokens (includes reasoning); total=input+output",
+ "wall_ms": 12647,
+ "warmup": false
+}

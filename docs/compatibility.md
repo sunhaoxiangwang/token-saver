@@ -23,6 +23,14 @@ needs an earlier revision.
 | Codex CLI 0.167.0 with `mcp_2026_07_28` | `Auto` lifecycle, `server/discover` first | not executed; feature flag off here |
 | ChatGPT Web via tunnel-client 0.0.20 (facts researched at 0.0.19) | documentation described `initialize` then `tools/list`; the capture shows `server/discover` with `2026-07-28` metadata, then `tools/list` and `tools/call` | Passed, operator run 2026-11-06 corroborated by the relay capture and the user-reported result (`docs/evidence/m0/chatgpt.*`); client export, helper stderr, and audit entries missing; request ids repeat across requests through the helper; the helper must stay running for every call |
 
+## Workspace Reading Pack (Milestone 1, `--root`)
+
+| Client | Behaviour observed on 2026-11-07 | Evidence status |
+|---|---|---|
+| Claude Code 2.1.319 | lists and calls all three tools in both eras (both runtimes appear across sessions); with `structuredContent` present it shows the model the structured JSON and drops the text block, so results are text-only; `--max-turns 12` did not bound a 65-turn run | Passed, automated proof against binary `6c943d80…`: all three tools, two provoked tool errors, every call correlated by digest with the relay, manifest complete; see `docs/evidence/m1/proofs/claude.*` |
+| Codex CLI 0.167.0 | lists and calls all three tools through its legacy `initialize`; `exec --json` reports `mcp_tool_call` items without `isError` and without a model id; the model is pinned by `-c model` | Passed, automated proof against binary `6c943d80…`: all three tools, two provoked tool errors (`is_error` from the relay), every call correlated by digest, manifest complete; see `docs/evidence/m1/proofs/codex.*` |
+| ChatGPT Web via tunnel-client | not run for Milestone 1 | Not executed: operator procedure (functional calls and relay payload bytes only; token counts Unsupported) |
+
 ## SDK behaviours recorded during verification
 
 - `server/discover` is a bootstrap probe and selects no lifecycle; the first non-discover modern

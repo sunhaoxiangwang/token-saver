@@ -1,0 +1,47 @@
+Verification checks of the corrected submission, 2026-11-08T06:23:55Z
+host: macOS 26.6 build 25G72, arm64, rustc 1.98.1 (48a229cea 2026-09-01)
+binary token-saver sha256 7c74925002e7d05ff4fa2400269bb3552792fc8043835b74352248da3e5fd229 bytes 2043440
+binary evidence-relay sha256 836c963bc0c1a331f4b00e94364be5e68130d2e6e81483bb493b906ad19f2b1f
+
+cargo fmt --all -- --check: Passed
+cargo clippy --workspace --all-targets -- -D warnings: Passed
+
+cargo test --workspace --no-fail-fast:
+Running unittests src/main.rs 
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+Running tests/relay.rs 
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.18s
+Running unittests src/lib.rs 
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+Running unittests src/main.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+Running tests/fixture_lifecycle.rs 
+test result: ok. 25 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 17.06s
+Running tests/schema.rs 
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+Running tests/stall_pipe.rs 
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.51s
+Running tests/wire_errors.rs 
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+Running tests/wire_legacy.rs 
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+Running tests/wire_lifecycle.rs 
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+Running tests/wire_modern.rs 
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+Running tests/wire_root.rs 
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.47s
+Running tests/workspace_confine.rs 
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.01s
+Running tests/workspace_contracts.rs 
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.40s
+Running tests/workspace_startup.rs 
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.12s
+Running tests/workspace_supervision.rs 
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.61s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+cargo deny --locked check: advisories ok, bans ok, licenses ok, sources ok
+cargo audit exit: 0 (Scanning Cargo.lock for vulnerabilities (140 crate dependencies))
+
+harness: OK (Ran 22 tests)

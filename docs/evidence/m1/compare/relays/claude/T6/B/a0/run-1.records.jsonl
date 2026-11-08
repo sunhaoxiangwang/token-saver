@@ -1,0 +1,8 @@
+{"bytes":508,"dir":"in","elapsed_ms":18,"id_sha256":"b10046fa8da535bb","kind":"request","meta_protocol_version":"2026-07-28","method":"server/discover","unix_ms":1794094334684}
+{"bytes":766,"dir":"out","elapsed_ms":21,"id_sha256":"b10046fa8da535bb","kind":"response","supported_versions":["2025-11-25","2026-07-28"],"unix_ms":1794094334688}
+{"bytes":479,"dir":"in","elapsed_ms":31,"id_sha256":"5feceb66ffc86f38","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/list","unix_ms":1794094334697}
+{"bytes":5249,"dir":"out","elapsed_ms":33,"id_sha256":"5feceb66ffc86f38","kind":"response","unix_ms":1794094334699}
+{"args_bytes":68,"args_sha256":"11bd5fee54ba316b","bytes":605,"dir":"in","elapsed_ms":54762,"id_sha256":"6b86b273ff34fce1","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":false,"tool":"text_search","unix_ms":1794094546541}
+{"bytes":909,"dir":"out","elapsed_ms":54764,"id_sha256":"6b86b273ff34fce1","is_error":false,"kind":"response","result_bytes":785,"result_sha256":"be99250187c8c7a8","unix_ms":1794094546542}
+{"args_bytes":59,"args_sha256":"b55d31feb0d6e865","bytes":595,"dir":"in","elapsed_ms":60726,"id_sha256":"d4735e3a265e16ee","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":false,"tool":"file_slice","unix_ms":1794094558738}
+{"bytes":1642,"dir":"out","elapsed_ms":60727,"id_sha256":"d4735e3a265e16ee","is_error":false,"kind":"response","result_bytes":1488,"result_sha256":"d47766e66571bb6b","unix_ms":1794094558739}

@@ -33,13 +33,16 @@ printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{"_me
 ```
 
 The second command prints one JSON-RPC result naming `supportedVersions` and exits with code 0 when
-stdin closes.
+stdin closes. To verify the Workspace Reading Pack, add `--root /abs/project` to the `serve` command
+and send a `tools/list`: four tools are listed, and stderr shows `event=workspace.root workers=4
+slots=8` without the path.
 
 ## Development tooling
 
 ```
 cargo test --workspace --no-fail-fast
 cargo test --test fixture_lifecycle -- --ignored bookkeeping --nocapture
+python3 -I -m unittest discover -s tools/token-compare/tests
 cargo clippy --workspace --all-targets -- -D warnings
 cargo deny --locked check
 cargo audit

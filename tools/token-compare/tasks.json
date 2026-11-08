@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "tasks": {
+    "T1": "Describe the top-level layout of this project: list every top-level file and directory name exactly as named, one per line, as a markdown list in the form `name — short phrase`. Include hidden entries that start with a dot. Do not list anything below the top level.",
+    "T2": "What is the value of the constant MAX_OUTBOUND_FRAME_BYTES in this project, and in which source file is it defined? Answer in one line in the form `<value> in <path>` and nothing else.",
+    "T3": "Reproduce lines 1 to 60 of src/main.rs exactly as they appear in the file, in one fenced code block, with no commentary before or after.",
+    "T4": "List the names of all test functions (functions annotated with #[test]) in tests/wire_errors.rs, one name per line, nothing else.",
+    "T5": "List every file under the docs/ directory whose content mentions the exact string outbound_too_large. Answer with the relative paths from the project root, one per line, nothing else.",
+    "T6": "Reproduce the budgets table from docs/transport.md (the markdown table whose columns are Budget, Starts at, Enforced by) exactly, as a markdown table, with no commentary."
+  },
+  "arm_order_by_task": {"T1": "ABC", "T2": "BCA", "T3": "CAB", "T4": "ABC", "T5": "BCA", "T6": "CAB"},
+  "attempts_per_cell": 7,
+  "warmup_attempts": 1
+}

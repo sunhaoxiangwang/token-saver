@@ -1,0 +1,8 @@
+{
+  "claude": {"bin": "claude", "model": "claude-fable-5-1", "max_turns": 12},
+  "codex": {"bin": "codex", "model": "gpt-6.1-sol", "reasoning_effort": "low"},
+  "timeout_s": 180,
+  "server_bin": "target/release/token-saver",
+  "relay_bin": "target/release/evidence-relay",
+  "hook_extract": "tools/evidence-relay/hook_extract.py"
+}

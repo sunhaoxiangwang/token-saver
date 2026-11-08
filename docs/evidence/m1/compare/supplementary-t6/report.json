@@ -1,0 +1,375 @@
+{
+ "cells": {
+  "claude/T6/A": {
+   "attempt_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "attempt_set_complete": true,
+   "attempts": 6,
+   "attempts_without_server_calls": 6,
+   "attributed": 6,
+   "bytes": [
+    {
+     "attempt": 1,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 2,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    },
+    {
+     "attempt": 2,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 3,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    },
+    {
+     "attempt": 3,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 4,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    },
+    {
+     "attempt": 4,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 2,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    },
+    {
+     "attempt": 5,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 2,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    },
+    {
+     "attempt": 6,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 2,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    }
+   ],
+   "completed": 6,
+   "compliant": 6,
+   "correct": 6,
+   "duplicate_or_extra_attempt_ids": [],
+   "failure_inclusive_median": {
+    "cache_read": 73891.0,
+    "cache_write": 10347.5,
+    "output": 667.0,
+    "total_tokens": 84956.0,
+    "uncached_input": 66.0
+   },
+   "failure_inclusive_sum": {
+    "cache_read": 472061,
+    "cache_write": 62747,
+    "output": 4459,
+    "total_tokens": 539695,
+    "uncached_input": 428
+   },
+   "lower_bounds_only": false,
+   "missing_attempt_ids": [],
+   "partial": 0,
+   "per_category_per_correct_answer": {
+    "cache_read": 78676.83333333333,
+    "cache_write": 10457.833333333334,
+    "output": 743.1666666666666,
+    "uncached_input": 71.33333333333333
+   },
+   "resolution": "resolved",
+   "server_calls_min": 0,
+   "success_conditioned_label": "success-conditioned, 6 of 6",
+   "success_conditioned_median": {
+    "cache_read": 73891.0,
+    "cache_write": 10347.5,
+    "output": 667.0,
+    "total_tokens": 84956.0,
+    "uncached_input": 66.0
+   },
+   "total_tokens_per_correct_answer": 89949.16666666667,
+   "usage_unavailable": 0
+  },
+  "claude/T6/B": {
+   "attempt_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "attempt_set_complete": true,
+   "attempts": 6,
+   "attempts_without_server_calls": 0,
+   "attributed": 6,
+   "bytes": [
+    {
+     "attempt": 1,
+     "client_recorded_result_bytes": 2795,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 3192,
+     "relay_result_text_bytes": 2795,
+     "tool_calls": 3
+    },
+    {
+     "attempt": 2,
+     "client_recorded_result_bytes": 3538,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 3963,
+     "relay_result_text_bytes": 3538,
+     "tool_calls": 3
+    },
+    {
+     "attempt": 3,
+     "client_recorded_result_bytes": 3349,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 3774,
+     "relay_result_text_bytes": 3349,
+     "tool_calls": 3
+    },
+    {
+     "attempt": 4,
+     "client_recorded_result_bytes": 2795,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 3192,
+     "relay_result_text_bytes": 2795,
+     "tool_calls": 3
+    },
+    {
+     "attempt": 5,
+     "client_recorded_result_bytes": 2780,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 3078,
+     "relay_result_text_bytes": 2780,
+     "tool_calls": 2
+    },
+    {
+     "attempt": 6,
+     "client_recorded_result_bytes": 2273,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 2551,
+     "relay_result_text_bytes": 2273,
+     "tool_calls": 2
+    }
+   ],
+   "completed": 6,
+   "compliant": 6,
+   "correct": 6,
+   "duplicate_or_extra_attempt_ids": [],
+   "failure_inclusive_median": {
+    "cache_read": 80474.0,
+    "cache_write": 12365.0,
+    "output": 848.0,
+    "total_tokens": 93779.0,
+    "uncached_input": 98.0
+   },
+   "failure_inclusive_sum": {
+    "cache_read": 482250,
+    "cache_write": 74243,
+    "output": 5012,
+    "total_tokens": 562093,
+    "uncached_input": 588
+   },
+   "lower_bounds_only": false,
+   "missing_attempt_ids": [],
+   "partial": 0,
+   "per_category_per_correct_answer": {
+    "cache_read": 80375.0,
+    "cache_write": 12373.833333333334,
+    "output": 835.3333333333334,
+    "uncached_input": 98.0
+   },
+   "resolution": "resolved",
+   "server_calls_min": 2,
+   "success_conditioned_label": "success-conditioned, 6 of 6",
+   "success_conditioned_median": {
+    "cache_read": 80474.0,
+    "cache_write": 12365.0,
+    "output": 848.0,
+    "total_tokens": 93779.0,
+    "uncached_input": 98.0
+   },
+   "total_tokens_per_correct_answer": 93682.16666666667,
+   "usage_unavailable": 0
+  },
+  "claude/T6/C": {
+   "attempt_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "attempt_set_complete": true,
+   "attempts": 6,
+   "attempts_without_server_calls": 2,
+   "attributed": 6,
+   "bytes": [
+    {
+     "attempt": 1,
+     "client_recorded_result_bytes": 2273,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 2551,
+     "relay_result_text_bytes": 2273,
+     "tool_calls": 2
+    },
+    {
+     "attempt": 2,
+     "client_recorded_result_bytes": 2010,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 2283,
+     "relay_result_text_bytes": 2010,
+     "tool_calls": 2
+    },
+    {
+     "attempt": 3,
+     "client_recorded_result_bytes": 1601,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 1862,
+     "relay_result_text_bytes": 1601,
+     "tool_calls": 2
+    },
+    {
+     "attempt": 4,
+     "client_recorded_result_bytes": 2273,
+     "native_tool_uses": 1,
+     "relay_response_frame_bytes": 2551,
+     "relay_result_text_bytes": 2273,
+     "tool_calls": 2
+    },
+    {
+     "attempt": 5,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 2,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    },
+    {
+     "attempt": 6,
+     "client_recorded_result_bytes": 0,
+     "native_tool_uses": 2,
+     "relay_response_frame_bytes": 0,
+     "relay_result_text_bytes": 0,
+     "tool_calls": 0
+    }
+   ],
+   "completed": 6,
+   "compliant": 6,
+   "correct": 6,
+   "duplicate_or_extra_attempt_ids": [],
+   "failure_inclusive_median": {
+    "cache_read": 102609.0,
+    "cache_write": 12053.0,
+    "output": 925.5,
+    "total_tokens": 118263.0,
+    "uncached_input": 98.0
+   },
+   "failure_inclusive_sum": {
+    "cache_read": 564498,
+    "cache_write": 74895,
+    "output": 5367,
+    "total_tokens": 645284,
+    "uncached_input": 524
+   },
+   "lower_bounds_only": false,
+   "missing_attempt_ids": [],
+   "partial": 0,
+   "per_category_per_correct_answer": {
+    "cache_read": 94083.0,
+    "cache_write": 12482.5,
+    "output": 894.5,
+    "uncached_input": 87.33333333333333
+   },
+   "resolution": "resolved",
+   "server_calls_min": 0,
+   "success_conditioned_label": "success-conditioned, 6 of 6",
+   "success_conditioned_median": {
+    "cache_read": 102609.0,
+    "cache_write": 12053.0,
+    "output": 925.5,
+    "total_tokens": 118263.0,
+    "uncached_input": 98.0
+   },
+   "total_tokens_per_correct_answer": 107547.33333333333,
+   "usage_unavailable": 0
+  }
+ },
+ "checker_version": 3,
+ "comparisons": {
+  "claude/T6": {
+   "arm_B_vs_A": {
+    "median_deltas": {
+     "cache_read": 6583.0,
+     "cache_write": 2017.5,
+     "output": 181.0,
+     "total_tokens": 8823.0,
+     "uncached_input": 32.0
+    },
+    "reasons": [
+     "arm B total tokens per correct answer not lower",
+     "success-conditioned medians do not point the same way"
+    ],
+    "verdict": "no saving established"
+   },
+   "arm_C_vs_A": {
+    "median_deltas": {
+     "cache_read": 28718.0,
+     "cache_write": 1705.5,
+     "output": 258.5,
+     "total_tokens": 33307.0,
+     "uncached_input": 32.0
+    },
+    "reasons": [
+     "arm B has 2 attempt(s) without any token-saver call",
+     "arm B total tokens per correct answer not lower",
+     "success-conditioned medians do not point the same way"
+    ],
+    "verdict": "no saving established"
+   }
+  }
+ },
+ "notes": [
+  "SUPPLEMENTARY complete rerun of Claude Code task T6 (arms A, B, C, attempts 0 to 6) on 2026-11-07 with the host kept awake (caffeinate), after host sleep (clamshell, 15:32 to about 18:10 local) interrupted four attempts of the primary T6/B cell, two of which failed with exit 1 and zero usage. The primary table is unchanged; this run adds information and is not used for any claim in compare/report.md."
+ ],
+ "records": 21,
+ "tasks_sha256": "d2d2776d9b51b080122a0516ab87c13845bce05398ccd127781fc572aa25f299",
+ "warmups": {
+  "claude/T6/A": [
+   {
+    "attempt": 0,
+    "correctness": "correct",
+    "total_tokens": 84734
+   }
+  ],
+  "claude/T6/B": [
+   {
+    "attempt": 0,
+    "correctness": "correct",
+    "total_tokens": 93042
+   }
+  ],
+  "claude/T6/C": [
+   {
+    "attempt": 0,
+    "correctness": "correct",
+    "total_tokens": 85640
+   }
+  ]
+ }
+}

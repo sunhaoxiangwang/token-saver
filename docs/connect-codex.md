@@ -39,6 +39,24 @@ relay file must show no `tools/call` and be complete. Disable with
 `-c 'mcp_servers.token-saver.enabled=false'` in a fresh session: the tool is absent and no child is
 spawned. Exiting the session ends the child; a new session yields a new `instance_id`.
 
+## Workspace Reading Pack (Milestone 1)
+
+Add `--root /abs/project` to the server command. Codex lists the tools under server `token-saver`
+and records each call as an `mcp_tool_call` item with `server`, `tool`, `arguments`, and `result`.
+Codex shows the model both representations of a tool result when both exist, so the text-only
+results of the workspace tools (`docs/tools.md`) reach it once. Before the model sees a result,
+Codex prefixes a wall-time header and applies its own truncation policy
+(`core/src/tools/context.rs` at `rust-v0.167.0`); the harness therefore names its byte metrics by
+observation point and never calls them model-visible.
+
+Automated verification (`tools/token-compare/compare.py proof --client codex`): one `codex exec`
+run with the relay, in a fresh fixture copy with `-c model="gpt-6.1-sol"`,
+`-c model_reasoning_effort="low"`, `-c sandbox_mode="read-only"`, `-c approval_policy="never"`,
+asked to call each tool once and to provoke two tool errors. Codex reports no model identifier in
+`exec --json`; the record carries the pinned value and says so. The comparison's arm B relies on an
+instruction sentence plus an audit of the items (any `command_execution` or non-MCP item, or any
+call to another server, is noncompliant). Results: `docs/evidence/m1/proofs/`.
+
 ## Persistent installation and removal, operator
 
 ```

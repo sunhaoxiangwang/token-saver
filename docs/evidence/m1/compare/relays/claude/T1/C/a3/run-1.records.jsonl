@@ -1,0 +1,12 @@
+{"bytes":508,"dir":"in","elapsed_ms":16,"id_sha256":"b10046fa8da535bb","kind":"request","meta_protocol_version":"2026-07-28","method":"server/discover","unix_ms":1794092072681}
+{"bytes":766,"dir":"out","elapsed_ms":16,"id_sha256":"b10046fa8da535bb","kind":"response","supported_versions":["2025-11-25","2026-07-28"],"unix_ms":1794092072681}
+{"bytes":479,"dir":"in","elapsed_ms":19,"id_sha256":"5feceb66ffc86f38","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/list","unix_ms":1794092072683}
+{"bytes":5249,"dir":"out","elapsed_ms":19,"id_sha256":"5feceb66ffc86f38","kind":"response","unix_ms":1794092072684}
+{"args_bytes":51,"args_sha256":"eefc5157d11a016b","bytes":594,"dir":"in","elapsed_ms":14585,"id_sha256":"6b86b273ff34fce1","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":false,"tool":"workspace_outline","unix_ms":1794092087250}
+{"bytes":542,"dir":"out","elapsed_ms":14586,"id_sha256":"6b86b273ff34fce1","is_error":false,"kind":"response","result_bytes":415,"result_sha256":"464671f67e1cd54e","unix_ms":1794092087251}
+{"args_bytes":51,"args_sha256":"af98bc06e0fe0aca","bytes":587,"dir":"in","elapsed_ms":27818,"id_sha256":"d4735e3a265e16ee","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":false,"tool":"file_slice","unix_ms":1794092100482}
+{"bytes":349,"dir":"out","elapsed_ms":27818,"id_sha256":"d4735e3a265e16ee","is_error":false,"kind":"response","result_bytes":234,"result_sha256":"3592219bfbecd78c","unix_ms":1794092100483}
+{"args_bytes":53,"args_sha256":"f9cfdb163e3cc393","bytes":589,"dir":"in","elapsed_ms":29003,"id_sha256":"4e07408562bedb8b","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":false,"tool":"file_slice","unix_ms":1794092101668}
+{"args_bytes":75,"args_sha256":"8ed73bb6a30eeea1","bytes":618,"dir":"in","elapsed_ms":29003,"id_sha256":"4b227777d4dd1fc6","kind":"request","meta_protocol_version":"2026-07-28","method":"tools/call","nonce_match":false,"tool":"workspace_outline","unix_ms":1794092101668}
+{"bytes":339,"dir":"out","elapsed_ms":29003,"id_sha256":"4b227777d4dd1fc6","is_error":false,"kind":"response","result_bytes":225,"result_sha256":"67c3932f8671b9b6","unix_ms":1794092101668}
+{"bytes":677,"dir":"out","elapsed_ms":29006,"id_sha256":"4e07408562bedb8b","is_error":false,"kind":"response","result_bytes":525,"result_sha256":"aed7e2f710753022","unix_ms":1794092101670}
