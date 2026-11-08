@@ -1,0 +1,15 @@
+# Reduced extract of the operator's helper log (tee of `tunnel-client run --profile token-saver-m1`),
+# 2026-11-07 local time (UTC-8). Server stderr lines are verbatim. Helper JSON lines are reduced to the
+# listed keys; tunnel, client-instance, request and application identifiers and host paths are removed.
+# The log ends with the sixth forwarded command: the tee pipeline ended with the Ctrl-C signal, so the
+# server's shutdown line was not retained (the relay manifest records child exit 0 and clean EOF).
+{"time": "2026-11-07T23:09:18.21673-08:00", "msg": "tunnel-client startup summary", "config_source": "profile:token-saver-m1", "mcp_target_kind": "stdio", "codex_plugin_installed": false}
+ts_ms=0 event=startup version=0.1.0 instance_id=eb9c5c87e37346d58643fa413482a5a1 supported_versions=2025-11-25,2026-07-28
+ts_ms=0 event=workspace.root workers=4 slots=8
+{"time": "2026-11-07T23:09:18.489277-08:00", "msg": "tunnel-client started", "version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b"}
+{"time": "2026-11-07T23:15:36.843929-08:00", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": "openai-mcp-discover", "channel": "main"}
+{"time": "2026-11-07T23:15:37.042587-08:00", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+{"time": "2026-11-07T23:19:16.629144-08:00", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+{"time": "2026-11-07T23:19:17.046512-08:00", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+{"time": "2026-11-07T23:19:23.665639-08:00", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}
+{"time": "2026-11-07T23:19:23.906036-08:00", "msg": "dispatcher forwarded command to MCP server", "rpc_request_id": 0, "channel": "main"}

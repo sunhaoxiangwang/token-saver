@@ -1,0 +1,46 @@
+{
+ "binary_sha256": "7c74925002e7d05ff4fa2400269bb3552792fc8043835b74352248da3e5fd229",
+ "calls": {
+  "1:workspace_outline": {
+   "args": {},
+   "args_sha256": "44136fa355b3678a",
+   "is_error": false,
+   "result_bytes": 260,
+   "result_sha256": "ab2c1ef61142a240",
+   "text": "f README.md 204\nd docs\nd src\nf docs/notes.md 134\nf src/main.rs 182\n# denied_entries=0 dirs_truncated=0 dirs_unreadable=0 dirs_visited=3 entries_listed=5 excluded_dirs=0 hidden_skipped=1 other_skipped=0 stop_reason=complete symlinks=0 too_deep=0 truncated=false"
+  },
+  "2:text_search": {
+   "args": {
+    "query": "needle"
+   },
+   "args_sha256": "22856f63675f0814",
+   "is_error": false,
+   "result_bytes": 450,
+   "result_sha256": "94451a17b91108b6",
+   "text": "== docs/notes.md\n4:Searching for the word needle should find exactly this line: needle.\n# bytes_scanned=520 dirs_truncated=0 dirs_visited=3 files_matched=1 files_scanned=3 files_skipped.binary=0 files_skipped.denied=0 files_skipped.excluded=0 files_skipped.hidden=1 files_skipped.other=0 files_skipped.symlink=0 files_skipped.too_deep=0 files_skipped.too_large=0 files_skipped.unreadable=0 matches=1 query_chars=6 stop_reason=complete truncated=false"
+  },
+  "3:file_slice": {
+   "args": {
+    "max_lines": 10,
+    "path": "src/main.rs",
+    "start_line": 1
+   },
+   "args_sha256": "c0b299a7c68e6782",
+   "is_error": false,
+   "result_bytes": 414,
+   "result_sha256": "52f012a9f42d055a",
+   "text": "1\t//! Demo program.\n2\t\n3\tconst GREETING: &str = \"hello from the demo\";\n4\tconst LIMIT_BYTES: usize = 16_384;\n5\t\n6\tfn main() {\n7\t    println!(\"{GREETING}\");\n8\t    println!(\"limit = {LIMIT_BYTES}\");\n9\t}\n# at_eof=true bytes_read=182 encoding=utf-8 end_line=9 file_bytes=182 last_line_partial=false line_endings=lf lines_cut=0 lossy=false returned_lines=9 start_line=1 stop_reason=complete total_lines=9 truncated=false"
+  },
+  "4:file_slice": {
+   "args": {
+    "path": ".env"
+   },
+   "args_sha256": "324de04ab4c80caf",
+   "is_error": true,
+   "result_bytes": 11,
+   "result_sha256": "73f8e4e4db1f23f1",
+   "text": "denied path"
+  }
+ },
+ "method": "the approved binary was run locally (stdio, initialize at 2026-07-28) against the same demo root with the four calls of the relay records; arguments canonicalized as the relay does (sorted keys, no whitespace); digests are the first 16 hex characters of SHA-256 over the first text content block"
+}

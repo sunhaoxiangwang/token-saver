@@ -78,7 +78,10 @@ legitimately returned it is the positive control that the extractor removes cont
 `m0/` holds the Milestone 0 pack for the binary hash named in its `artifact-index.json`; packs for
 superseded resubmissions are kept as `m0-r<n>/` with their own index so that earlier review findings
 stay reproducible. `m1/` holds the Milestone 1 proofs (`proofs/`) and the comparison (`compare/`:
-`report.json`, `report.md`, one attempt record per run) for the binary hash named in its index.
+`report.json`, `report.md`, one attempt record per run) for the historical binary hash named in its
+index, the corrected build's verification proofs and checks (`verification/`), and the ChatGPT
+operator capture (`chatgpt/`), each block of the index naming the binary and relay hashes it was
+produced with.
 Each index records the raw-artifact hashes, their disposition, and per-file hashes.
 
 ## Statuses

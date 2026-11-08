@@ -1,0 +1,189 @@
+{
+ "verification": "server-side relay capture of the Milestone 1 ChatGPT operator run; every argument and result digest equals a local reproduction with the approved binary, and the user-reported ChatGPT result matches the server output",
+ "date_local": "2026-11-07 (UTC-8)",
+ "procedure": "docs/connect-chatgpt-tunnel.md, Workspace Reading Pack operator procedure: workspace_outline, text_search and file_slice once each, then one erroneous call (file_slice of .env, a denied path); run from one ChatGPT conversation after a fresh profile, doctor and health check",
+ "helper_version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b (git sha: c2144b0904980bcbae2636cdca4f4167e9818e0b)",
+ "helper_version_from_log": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b",
+ "server_binary_sha256": "7c74925002e7d05ff4fa2400269bb3552792fc8043835b74352248da3e5fd229",
+ "relay_binary_sha256": "836c963bc0c1a331f4b00e94364be5e68130d2e6e81483bb493b906ad19f2b1f",
+ "binaries_equal_index_verification_block": true,
+ "root": "a four-file demo directory outside the repository (README.md, docs/notes.md, src/main.rs, and a placeholder .env); its path is replaced by <root> in the retained manifests",
+ "relay": {
+  "run": 2,
+  "complete": true,
+  "reason": "orderly",
+  "frames_in": 6,
+  "frames_out": 6,
+  "records": 12,
+  "dropped": 0,
+  "dropped_in_flight": 0,
+  "late_frames": 0,
+  "in_flight_at_seal": 0,
+  "in_flight_unresolved": 0,
+  "pending_correlations": 0,
+  "inbound_outcome": "clean_eof",
+  "outbound_outcome": "clean_eof",
+  "child_exit": {
+   "code": 0,
+   "signal": null
+  },
+  "elapsed_ms": 1084511,
+  "records_sha256": "13894cf83e17bd360ee259742874c389ee10de15a50a3e2cfa7c04c5a5af799e",
+  "expect_nonce_configured": true
+ },
+ "relay_run_1": {
+  "note": "first daemon start on the new profile, stopped by the operator after 46 s before any ChatGPT traffic; zero frames",
+  "complete": true,
+  "records": 0,
+  "child_exit": {
+   "code": 0,
+   "signal": null
+  }
+ },
+ "operator_original_manifest_sha256": {
+  "run-2.manifest.json": "8ebadc8296cc5effdbdef91a67f398c83bce3aa348970d0d780a5b04ae391a7b",
+  "run-1.manifest.json": "a9a3b290b5aee603e80a6cbc32fb9017062c9fedfd24ad72da06dd0c29408c21"
+ },
+ "wire": {
+  "sequence": "server/discover with 2026-07-28 metadata, then tools/list and four tools/call, each with 2026-07-28 metadata; no initialize",
+  "discover_supported_versions_in_response": [
+   "2025-11-25",
+   "2026-07-28"
+  ],
+  "request_ids": "tools/list and all four tools/call carried the same request id (the helper forwards rpc id 0); the server accepted each because the previous one had retired; pending_correlations 0",
+  "timeline_local": {
+   "daemon_and_child_start": "2026-11-07T23:09:18.215-08:00",
+   "server_discover": "2026-11-07T23:15:36.705-08:00",
+   "tools_list": "2026-11-07T23:15:36.919-08:00",
+   "first_tools_call": "2026-11-07T23:19:16.523-08:00",
+   "last_tools_call": "2026-11-07T23:19:23.814-08:00",
+   "capture_end_ctrl_c": "2026-11-07T23:27:22.731-08:00"
+  },
+  "server_elapsed_ms": {
+   "discover": 4,
+   "tools_list": 1
+  }
+ },
+ "calls": [
+  {
+   "order": 1,
+   "tool": "workspace_outline",
+   "args_canonical": "{}",
+   "args_bytes": 2,
+   "args_sha256": "44136fa355b3678a",
+   "request_frame_bytes": 1037,
+   "response_frame_bytes": 378,
+   "result_bytes": 260,
+   "result_sha256": "ab2c1ef61142a240",
+   "is_error": false,
+   "server_elapsed_ms": 2,
+   "at_local": "2026-11-07T23:19:16.523-08:00",
+   "meta_protocol_version": "2026-07-28",
+   "nonce_match": false,
+   "reproduction_match": true,
+   "reported_text": "identical"
+  },
+  {
+   "order": 2,
+   "tool": "text_search",
+   "args_canonical": "{\"query\":\"needle\"}",
+   "args_bytes": 18,
+   "args_sha256": "22856f63675f0814",
+   "request_frame_bytes": 1047,
+   "response_frame_bytes": 565,
+   "result_bytes": 450,
+   "result_sha256": "94451a17b91108b6",
+   "is_error": false,
+   "server_elapsed_ms": 1,
+   "at_local": "2026-11-07T23:19:16.892-08:00",
+   "meta_protocol_version": "2026-07-28",
+   "nonce_match": false,
+   "reproduction_match": true,
+   "reported_text": "identical"
+  },
+  {
+   "order": 3,
+   "tool": "file_slice",
+   "args_canonical": "{\"max_lines\":10,\"path\":\"src/main.rs\",\"start_line\":1}",
+   "args_bytes": 52,
+   "args_sha256": "c0b299a7c68e6782",
+   "request_frame_bytes": 1080,
+   "response_frame_bytes": 551,
+   "result_bytes": 414,
+   "result_sha256": "52f012a9f42d055a",
+   "is_error": false,
+   "server_elapsed_ms": 1,
+   "at_local": "2026-11-07T23:19:23.549-08:00",
+   "meta_protocol_version": "2026-07-28",
+   "nonce_match": false,
+   "reproduction_match": true,
+   "reported_text": "identical"
+  },
+  {
+   "order": 4,
+   "tool": "file_slice",
+   "args_canonical": "{\"path\":\".env\"}",
+   "args_bytes": 15,
+   "args_sha256": "324de04ab4c80caf",
+   "request_frame_bytes": 1043,
+   "response_frame_bytes": 123,
+   "result_bytes": 11,
+   "result_sha256": "73f8e4e4db1f23f1",
+   "is_error": true,
+   "server_elapsed_ms": 1,
+   "at_local": "2026-11-07T23:19:23.814-08:00",
+   "meta_protocol_version": "2026-07-28",
+   "nonce_match": false,
+   "reproduction_match": true,
+   "reported_text": "ChatGPT surfaced the tool error as an INVALID_ARGUMENT exception text quoting the TextContent 'denied path'"
+  }
+ ],
+ "payload_bytes_from_relay": {
+  "discover_request": 413,
+  "discover_response": 762,
+  "tools_list_request": 388,
+  "tools_list_response": 5249,
+  "tools_call_requests_total": 4207,
+  "tools_call_responses_total": 1617,
+  "result_text_bytes_total": 1135
+ },
+ "token_counts": "Unsupported through ChatGPT; only payload bytes are available, from the relay records",
+ "nonce": {
+  "configured_on_relay": true,
+  "exercised": false,
+  "note": "the Milestone 1 procedure calls no connection_probe, so nonce_match is false on every record; correlation rests on the argument and result digests and the sequential record timeline"
+ },
+ "helper_stderr": {
+  "server_startup_line_captured": true,
+  "workspace_root_line_captured": true,
+  "forwarded_commands_logged": 6,
+  "shutdown_line_captured": false
+ },
+ "confirmation_behaviour": {
+  "connector_permission_setting": "Allow low-risk, as shown on the connector page the operator pasted (connected 2026-11-06, plugin version 1.0.0, authorization none, review status development)",
+  "per_call_prompts": "not recorded by the operator; per-call denial remains Unsupported"
+ },
+ "evidence_sources": {
+  "relay_records": "read directly from the finalized local relay capture",
+  "reported_result": "ChatGPT reply text saved by the operator (user_reported_tool_result)",
+  "reproduction": "local run of the approved binary (chatgpt-reproduction.json)",
+  "helper_stderr": "operator's tee of the daemon output, reduced",
+  "helper_version": "installed helper --version and the log's started line"
+ },
+ "evidence_not_in_this_capture": [
+  "ChatGPT's own tool-call details export (the UI offered none)",
+  "the server's shutdown line (the tee pipeline ended with the Ctrl-C signal; the relay manifest records child exit 0 and clean EOF in both directions)",
+  "Platform audit entries",
+  "the health and doctor outputs (pasted by the operator during the run, not retained)"
+ ],
+ "milestone_status": "M1-08 functional calls and payload bytes: Passed. Token counts through ChatGPT: Unsupported. Disable, re-enable, daemon stop and restart, child kill, and removal steps: Not executed",
+ "artifact_sha256": {
+  "chatgpt-reported-result.json": "aaeded213d1f56f81da2b71e74d9743a54b1ba7aa159cc111529b9c34a3160f1",
+  "chatgpt-reported-result.txt": "27d204bd8bb040a85940f189c31f0fade35c9e6e5a7969fe1461876a7114d748",
+  "chatgpt-reproduction.json": "5427888b9e1def64147b0349ae1f2f8e286095ce782d44e47eb531016810c095",
+  "chatgpt.helper-stderr-extract.txt": "5790fd4238a26f4249ecef82da83cbe1f7c00542ccbca24bea06572cd2e043f4",
+  "chatgpt.relay.manifest.json": "637799c09f70438a99150d4e6dffc8072ca1a778fb1645fec13f7864c3ec50aa",
+  "chatgpt.relay.records.jsonl": "13894cf83e17bd360ee259742874c389ee10de15a50a3e2cfa7c04c5a5af799e",
+  "chatgpt.relay.run-1.manifest.json": "abcb6d62eee40d9099c79a67837504e98e805a3289c984d0352817ee8539939e"
+ }
+}

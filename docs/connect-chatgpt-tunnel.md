@@ -103,10 +103,53 @@ ChatGPT shows no confirmation for a read-only tool. Every item is labelled with 
 
 ## Workspace Reading Pack (Milestone 1), operator procedure
 
-Not executed in Milestone 1. To run it: add `--root /abs/project` to the helper's `--mcp-command`
-(quote the command), using only a directory whose content you would upload to ChatGPT, then from
-ChatGPT call `workspace_outline`, `text_search`, and `file_slice` once each and one erroneous call,
-with the relay in the command so the capture records `args_sha256` and `result_sha256` per call.
-Evidence: the relay manifest (`complete: true`) and records, your tool-call export, and the server's
-startup line from the helper's stderr. Token counts through ChatGPT are Unsupported; payload bytes
-come from the relay records.
+Passed for the functional calls and payload bytes: run on 2026-11-07 by the operator through
+tunnel-client 0.0.20 against the approved binary `7c749250…` and relay `836c963b…` (the `verification` build of `docs/evidence/m1/artifact-index.json`),
+with the relay in front of the server and `--root` pointing at a four-file demo directory outside the
+repository (`README.md`, `docs/notes.md`, `src/main.rs`, and a placeholder `.env`). A new profile
+`token-saver-m1` was created with `init --sample sample_mcp_stdio_local`, the runtime key by `file:`
+reference and the relay command carrying `--root`; `doctor --explain` reported ok; `health --port 8080
+--require-control-plane-poll` reported OK once the control-plane poll had succeeded, about 30 s after
+start (`health` takes no `--profile` flag in v0.0.20). The operator was instructed to set
+`mcp.max_concurrent_requests: 8` in the profile; whether the line was added was not confirmed (the
+profile is not read here), and the run never had more than one request in flight. Evidence in
+`docs/evidence/m1/chatgpt/`:
+
+- `chatgpt.relay.manifest.json` and `chatgpt.relay.records.jsonl`: `complete: true`, `reason:
+  orderly`, 6 frames in, 6 out, 12 records, zero drops and late frames, child exit 0 on clean EOF in
+  both directions after 1,084 s. ChatGPT sent `server/discover` (`2026-07-28` metadata), `tools/list`
+  (5,249-byte response listing the four tools), then `workspace_outline {}`, `text_search
+  {"query":"needle"}`, `file_slice {"path":"src/main.rs","start_line":1,"max_lines":10}`, and the
+  erroneous `file_slice {"path":".env"}` (`is_error: true`, `denied path`). Server round trips were 1
+  to 4 ms. The manifests' argv paths are replaced by placeholders; the originals' hashes are in the
+  verification file. `chatgpt.relay.run-1.manifest.json` is the first daemon start, stopped after
+  46 s before any traffic.
+- `chatgpt-reproduction.json`: the four calls replayed locally against the same root with the same
+  binary; every `args_sha256` and `result_sha256` equals the relay record.
+- `chatgpt-reported-result.txt` and `.json`: the ChatGPT reply saved by the operator; the three
+  successful outputs are byte-identical to the server text, and the error reached the user as an
+  `INVALID_ARGUMENT` exception text quoting `denied path`. The UI offered no per-call details to
+  export, so this is a `user_reported_tool_result`, weaker than a client export.
+- `chatgpt.helper-stderr-extract.txt`: the server's `startup` and `workspace.root` lines from the
+  helper's stderr (missing in Milestone 0) and the six forwarded commands, reduced; the shutdown line
+  was not retained because the tee pipeline ended with the Ctrl-C signal.
+- `chatgpt-verification.json`: helper version, hashes, payload bytes, timeline, and what is missing.
+
+Observations: as in Milestone 0, `tools/list` and every `tools/call` carried the same request id
+(the helper forwards rpc id 0) and the server accepted each because the previous one had retired. The
+first ChatGPT request arrived 378 s after daemon start; the four calls spanned 7.3 s. The relay's
+`--expect-nonce` came from the init template; the Milestone 1 procedure calls no `connection_probe`,
+so `nonce_match` is false on every record and correlation rests on the digests. The connector page
+showed the permission setting `Allow low-risk`; whether ChatGPT prompted per call was not recorded,
+so per-call denial remains Unsupported. Token counts through ChatGPT are Unsupported; payload bytes
+come from the relay records (request frames 4,207 bytes and response frames 1,617 bytes over the four
+calls, 1,135 bytes of result text).
+
+Still missing: ChatGPT's own tool-call export, the Platform audit entries, and the doctor and health
+outputs (pasted during the run, not retained). Not executed for Milestone 1: disable, re-enable,
+daemon stop and restart, child kill, and removal.
+
+To repeat it: add `--root /abs/project` to the helper's `--mcp-command` (quote the command), using
+only a directory whose content you would upload to ChatGPT, then from ChatGPT call
+`workspace_outline`, `text_search`, and `file_slice` once each and one erroneous call, with the relay
+in the command so the capture records `args_sha256` and `result_sha256` per call.

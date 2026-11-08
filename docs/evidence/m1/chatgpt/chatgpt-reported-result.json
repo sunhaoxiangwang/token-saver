@@ -1,0 +1,12 @@
+{
+ "calls_reported": 4,
+ "comparison_to_server_output": {
+  "1:workspace_outline": "identical",
+  "2:text_search": "identical",
+  "3:file_slice": "identical",
+  "4:file_slice": "ChatGPT surfaced the tool error as an INVALID_ARGUMENT exception text quoting the TextContent 'denied path'"
+ },
+ "evidence_type": "user_reported_tool_result",
+ "source": "ChatGPT reply text saved by the operator from the chat into a local file and copied here unchanged (chatgpt-reported-result.txt); the chat UI offered no per-call tool-call details to export",
+ "weaker_than": "a client tool-call export"
+}

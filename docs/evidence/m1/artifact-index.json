@@ -1,4 +1,11 @@
 {
+ "chatgpt": {
+  "binary_sha256": "7c74925002e7d05ff4fa2400269bb3552792fc8043835b74352248da3e5fd229",
+  "date_local": "2026-11-07",
+  "helper_version": "0.0.20+c2144b0904980bcbae2636cdca4f4167e9818e0b (git sha: c2144b0904980bcbae2636cdca4f4167e9818e0b)",
+  "note": "M1-08 operator run through ChatGPT Web and tunnel-client against the corrected build (equal to `verification`); evidence under chatgpt/; the relay manifests' argv paths were replaced by placeholders before retention; the reported result is a user-pasted reply (weaker than a client export)",
+  "relay_sha256": "836c963bc0c1a331f4b00e94364be5e68130d2e6e81483bb493b906ad19f2b1f"
+ },
  "clients": {
   "claude_code": "2.1.319 (from init lines)",
   "claude_model": "claude-fable-5-1 (from init lines)",
@@ -15,6 +22,14 @@
   "relay_sha256": "26c5e7e033a7ba29b49e70fafb0f9b59847e3df5e5f9f1af612036a49f016451"
  },
  "pack_hashes": {
+  "chatgpt/chatgpt-reported-result.json": "aaeded213d1f56f81da2b71e74d9743a54b1ba7aa159cc111529b9c34a3160f1",
+  "chatgpt/chatgpt-reported-result.txt": "27d204bd8bb040a85940f189c31f0fade35c9e6e5a7969fe1461876a7114d748",
+  "chatgpt/chatgpt-reproduction.json": "5427888b9e1def64147b0349ae1f2f8e286095ce782d44e47eb531016810c095",
+  "chatgpt/chatgpt-verification.json": "59923a31349d06fcdce190f905781a9ae66956c916816897b82d6783ae52528f",
+  "chatgpt/chatgpt.helper-stderr-extract.txt": "5790fd4238a26f4249ecef82da83cbe1f7c00542ccbca24bea06572cd2e043f4",
+  "chatgpt/chatgpt.relay.manifest.json": "637799c09f70438a99150d4e6dffc8072ca1a778fb1645fec13f7864c3ec50aa",
+  "chatgpt/chatgpt.relay.records.jsonl": "13894cf83e17bd360ee259742874c389ee10de15a50a3e2cfa7c04c5a5af799e",
+  "chatgpt/chatgpt.relay.run-1.manifest.json": "abcb6d62eee40d9099c79a67837504e98e805a3289c984d0352817ee8539939e",
   "compare/attempts/claude-T1-A-a0.json": "17a63d495001a5eec03f7f4f8dad1f5e30dc62b48b268954ccc1377cd449a3c0",
   "compare/attempts/claude-T1-A-a1.json": "4bff027ed076740dc04de92cb66d3899c9659a05b39ef3cde1a1a60c0f399b5b",
   "compare/attempts/claude-T1-A-a2.json": "5c2b382f5e0e9c27e42b26e1884b219f6c9d883f99b3abe8577c806de3cfc5f2",

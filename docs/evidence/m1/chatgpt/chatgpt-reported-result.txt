@@ -1,0 +1,45 @@
+Executed the four token-saver tool calls in the requested order. Below are their complete outputs, including the final `#` metadata lines.
+
+### 1. `workspace_outline({})`
+
+```
+f README.md 204
+d docs
+d src
+f docs/notes.md 134
+f src/main.rs 182
+# denied_entries=0 dirs_truncated=0 dirs_unreadable=0 dirs_visited=3 entries_listed=5 excluded_dirs=0 hidden_skipped=1 other_skipped=0 stop_reason=complete symlinks=0 too_deep=0 truncated=false
+```
+
+### 2. `text_search({"query":"needle"})`
+
+```
+== docs/notes.md
+4:Searching for the word needle should find exactly this line: needle.
+# bytes_scanned=520 dirs_truncated=0 dirs_visited=3 files_matched=1 files_scanned=3 files_skipped.binary=0 files_skipped.denied=0 files_skipped.excluded=0 files_skipped.hidden=1 files_skipped.other=0 files_skipped.symlink=0 files_skipped.too_deep=0 files_skipped.too_large=0 files_skipped.unreadable=0 matches=1 query_chars=6 stop_reason=complete truncated=false
+```
+
+### 3. `file_slice({"path":"src/main.rs","start_line":1,"max_lines":10})`
+
+```
+1	//! Demo program.
+2	
+3	const GREETING: &str = "hello from the demo";
+4	const LIMIT_BYTES: usize = 16_384;
+5	
+6	fn main() {
+7	    println!("{GREETING}");
+8	    println!("limit = {LIMIT_BYTES}");
+9	}
+# at_eof=true bytes_read=182 encoding=utf-8 end_line=9 file_bytes=182 last_line_partial=false line_endings=lf lines_cut=0 lossy=false returned_lines=9 start_line=1 stop_reason=complete total_lines=9 truncated=false
+```
+
+### 4. `file_slice({"path":".env"})`
+
+As expected, access was refused. Exact error text:
+
+```
+INVALID_ARGUMENT: Error code: INVALID_ARGUMENT; Error: RuntimeException: Error calling MCP tool: [TextContent(type='text', text='denied path', annotations=None, meta=None)]
+```
+
+I made exactly 4 token-saver tool calls, with 3 successful results and 1 denied request.
